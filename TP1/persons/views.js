@@ -60,10 +60,7 @@ function _usePersonFromRequest(request, response, next, queryMethod) {
                 response.send(results);
             }
             else {
-                next({
-                    status: 404,
-                    message: "No such person."
-                })
+                app.throwNotFound(next);
             }
         }
     );
@@ -100,10 +97,7 @@ module.exports.deletePerson = function (request, response, next) {
         Person.destroy(_getPersonQueryFromRequest(request)),
         results => {
             if (!results) {
-                next({
-                    status: 404,
-                    message: "No such person."
-                });
+                app.throwNotFound(next);
             } else {
                 response.status("204").send("");
             }

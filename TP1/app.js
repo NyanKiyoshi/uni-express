@@ -24,8 +24,16 @@ function errorHandler(err, req, res, next) {
     });
 }
 
+function throwNotFound(next) {
+    next({
+        status: 404,
+        message: "No such object."
+    });
+}
+
 app.use(bodyParser.json());
 
 module.exports = app;
 module.exports.query = query;
 module.exports.errorHandler = errorHandler;
+module.exports.throwNotFound = throwNotFound;
