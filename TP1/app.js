@@ -11,6 +11,14 @@ function query(next, promise, thenFunc) {
 }
 
 function errorHandler(err, req, res, next) {
+    if (err.stack) {
+        console.error(err.stack);
+        err = {
+            status: 500,
+            error: err
+        }
+    }
+
     res.status(err.status).json({
         error: err
     });
