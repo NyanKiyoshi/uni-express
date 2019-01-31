@@ -1,0 +1,27 @@
+{
+  "name": "w4a",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node TP1/index.js",
+    "migrate": "node TP1/commands/migrate.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NyanKiyoshi/w4a.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NyanKiyoshi/w4a/issues"
+  },
+  "homepage": "https://github.com/NyanKiyoshi/w4a#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mysql2": "^1.6.4",
+    "pg": "^7.8.0",
+    "sequelize": "^4.42.0"
+  }
+}
