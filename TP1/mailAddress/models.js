@@ -16,6 +16,7 @@ const MailAddress = db.define("MailAddress", {
     }
 });
 
-Person.hasMany(MailAddress, {as: "mailAddresses"});
+Person.hasMany(MailAddress, {as: "mailAddresses", onDelete: "CASCADE"});
+MailAddress.belongsTo(Person, { onDelete: "CASCADE" });
 
 module.exports.MailAddress = MailAddress;
