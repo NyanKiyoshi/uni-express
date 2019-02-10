@@ -17,7 +17,21 @@ const routesMailPostals = require("./postalAddress/routes");
 // app.use("/persons", routesMailPhones);
 // app.use("/persons", routesMailPostals);
 
-app.use("/", RESTFulManager(models.persons.Person, "person", {}, {}, {}));
+app.use("/", RESTFulManager(
+    // Model
+    models.persons.Person,
+
+    // Endpoint
+    "persons",
+
+    // Bases
+    {},
+
+    // Fields
+    ["firstname", "lastname"],
+
+    // Searchable fields
+    ["lastname"]));
 
 // Define the error middleware
 app.use(app.errorHandler);
