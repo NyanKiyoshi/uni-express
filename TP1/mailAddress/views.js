@@ -1,7 +1,6 @@
-const config = require("../config");
+const app = require("../app");
 const models = require("../models");
 
-const app = config.app;
 const MailAddress = models.mailAddress.MailAddress;
 
 function _getWhereParamsFromRequest(request) {
