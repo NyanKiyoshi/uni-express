@@ -31,9 +31,24 @@ function throwNotFound(next) {
     });
 }
 
+/**
+ * Sends a JSON response to an express app with a status code.
+ * For some reason, setting a status code sets the content type wrong.
+ * @param response
+ * @param jsonBody
+ * @param status
+ */
+function sendJsonWithStatus(response, jsonBody, status) {
+    response
+        .status(status)
+        .set('Content-Type', 'application/json')
+        .json(jsonBody)
+}
+
 app.use(bodyParser.json());
 
 module.exports = app;
 module.exports.query = query;
 module.exports.errorHandler = errorHandler;
 module.exports.throwNotFound = throwNotFound;
+module.exports.sendJsonWithStatus = sendJsonWithStatus;
