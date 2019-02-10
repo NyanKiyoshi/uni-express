@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require("../db");
-const Person = require("./person");
+const Person = require("./Person");
 
 const PostalAddress = db.define("PostalAddress", {
     type: {
