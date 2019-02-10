@@ -8,17 +8,17 @@ const _ = require("../routes");
 
 beforeEach(async function () {
     await db.sync({ force: true }).then(value => {
-        models.persons.Person.create({
+        models.Person.create({
             id: 1,
             firstname: "John",
             lastname: "Doe"
         });
-        models.persons.Person.create({
+        models.Person.create({
             id: 2,
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.postalAddress.PostalAddress.create({
+        models.PostalAddress.create({
             id: 1,
             type: "work",
             address: "3 rue",
@@ -43,7 +43,7 @@ exports.inexisting_should_person_return_404 = function(done){
         });
 };
 
-exports.person_without_postal_address_number_should_return_empty = function(done){
+exports.person_without_address_number_should_return_empty = function(done){
     supertest(app)
         .get('/persons/1/postalAddresses')
         .expect(200)
@@ -60,7 +60,7 @@ exports.person_without_postal_address_number_should_return_empty = function(done
         });
 };
 
-exports.person_with_postal_address_number_should_not_return_empty = function(done){
+exports.person_with_address_number_should_not_return_empty = function(done){
     supertest(app)
         .get('/persons/2/postalAddresses')
         .expect(200)
@@ -146,11 +146,11 @@ exports.get_existing_number = function(done){
         });
 };
 
-exports.create_new_postal_address_number = function(done){
+exports.create_new_address_number = function(done){
     supertest(app)
         .post('/persons/2/postalAddresses')
-        .send({"postal_type": "home", "postal_address": "6 rue"})
-        .expect(200)
+        .send({"type": "home", "address": "6 rue"})
+        .expect(201)
         .end(async function (err, response) {
             assert.ifError(err);
 
@@ -167,7 +167,7 @@ exports.create_new_postal_address_number = function(done){
 exports.update_inexisting_number = function(done){
     supertest(app)
         .put('/persons/2/postalAddresses/12')
-        .send({"postal_type": "home", "postal_address": "+22 0000"})
+        .send({"type": "home", "address": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -183,12 +183,12 @@ exports.update_inexisting_number = function(done){
 exports.update_existing_number = function(done){
     supertest(app)
         .put('/persons/2/postalAddresses/1')
-        .send({"postal_type": "home", "postal_address": "7 rue"})
+        .send({"type": "home", "address": "7 rue"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.postalAddress.PostalAddress.findByPk(1).then(value => {
+            await models.PostalAddress.findByPk(1).then(value => {
                 assert.strictEqual(value.get("PersonId"), 2);
                 assert.strictEqual(value.get("type"), "home");
                 assert.strictEqual(value.get("address"), "7 rue");
@@ -220,7 +220,7 @@ exports.delete_existing_number = function(done){
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.postalAddress.PostalAddress.findByPk(1).then(value => {
+            await models.PostalAddress.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

@@ -8,17 +8,17 @@ const _ = require("../routes");
 
 beforeEach(async function () {
     await db.sync({ force: true }).then(value => {
-        models.persons.Person.create({
+        models.Person.create({
             id: 1,
             firstname: "John",
             lastname: "Doe"
         });
-        models.persons.Person.create({
+        models.Person.create({
             id: 2,
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.mailAddress.MailAddress.create({
+        models.MailAddress.create({
             id: 1,
             type: "work",
             address: "miss@example.com",
@@ -30,7 +30,7 @@ beforeEach(async function () {
 
 exports.inexisting_should_person_return_404 = function(done){
     supertest(app)
-        .get('/persons/555/mailAddress')
+        .get('/persons/555/mailAddresses')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -45,7 +45,7 @@ exports.inexisting_should_person_return_404 = function(done){
 
 exports.person_without_mail_address_should_return_empty = function(done){
     supertest(app)
-        .get('/persons/1/mailAddress')
+        .get('/persons/1/mailAddresses')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -62,7 +62,7 @@ exports.person_without_mail_address_should_return_empty = function(done){
 
 exports.person_with_mail_address_should_not_return_empty = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress')
+        .get('/persons/2/mailAddresses')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -83,7 +83,7 @@ exports.person_with_mail_address_should_not_return_empty = function(done){
 
 exports.filter_phone_numbers_valid_return = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress?type=work')
+        .get('/persons/2/mailAddresses?type=work')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -100,7 +100,7 @@ exports.filter_phone_numbers_valid_return = function(done){
 
 exports.filter_phone_numbers_valid_return = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress?type=home')
+        .get('/persons/2/mailAddresses?type=home')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -117,7 +117,7 @@ exports.filter_phone_numbers_valid_return = function(done){
 
 exports.get_inexisting_address = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress/12')
+        .get('/persons/2/mailAddresses/12')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -132,7 +132,7 @@ exports.get_inexisting_address = function(done){
 
 exports.get_existing_address = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress/1')
+        .get('/persons/2/mailAddresses/1')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -148,9 +148,9 @@ exports.get_existing_address = function(done){
 
 exports.create_new_phone_number = function(done){
     supertest(app)
-        .post('/persons/2/mailAddress')
+        .post('/persons/2/mailAddresses')
         .send({"type": "work", "address": "miss3@example.com"})
-        .expect(200)
+        .expect(201)
         .end(async function (err, response) {
             assert.ifError(err);
 
@@ -166,7 +166,8 @@ exports.create_new_phone_number = function(done){
 
 exports.update_inexisting_address = function(done){
     supertest(app)
-        .put('/persons/2/mailAddress/12')
+        .put('/persons/2/mailAddresses/12')
+        .send({"type": "home", "address": "miss2@example.com"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -181,13 +182,13 @@ exports.update_inexisting_address = function(done){
 
 exports.update_existing_address = function(done){
     supertest(app)
-        .put('/persons/2/mailAddress/1')
+        .put('/persons/2/mailAddresses/1')
         .send({"type": "home", "address": "miss2@example.com"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.mailAddress.MailAddress.findByPk(1).then(value => {
+            await models.MailAddress.findByPk(1).then(value => {
                 assert.strictEqual(value.get("PersonId"), 2);
                 assert.strictEqual(value.get("type"), "home");
                 assert.strictEqual(value.get("address"), "miss2@example.com");
@@ -199,7 +200,7 @@ exports.update_existing_address = function(done){
 
 exports.delete_inexisting_address = function(done){
     supertest(app)
-        .delete('/persons/2/mailAddress/12')
+        .delete('/persons/2/mailAddresses/12')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -214,12 +215,12 @@ exports.delete_inexisting_address = function(done){
 
 exports.delete_existing_address = function(done){
     supertest(app)
-        .delete('/persons/2/mailAddress/1')
+        .delete('/persons/2/mailAddresses/1')
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.mailAddress.MailAddress.findByPk(1).then(value => {
+            await models.MailAddress.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

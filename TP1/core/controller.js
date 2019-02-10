@@ -1,10 +1,4 @@
-const express = require('express');
-
-const Person = require("../models").persons.Person;
-const app = require("../app");
-
 const views = require("./views");
-const utils = require("./utils");
 const routes = require("./routes");
 
 /**

@@ -1,4 +1,4 @@
-module.exports.persons = require("./persons/models");
-module.exports.mailAddress = require("./mailAddress/models");
-module.exports.phones = require("./phone/models");
-module.exports.postalAddress = require("./postalAddress/models");
+module.exports.Person = require("./models/person");
+module.exports.MailAddress = require("./models/mailAddress");
+module.exports.Phone = require("./models/phone");
+module.exports.PostalAddress = require("./models/postalAddress");

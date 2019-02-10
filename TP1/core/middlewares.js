@@ -2,26 +2,21 @@ const express = require("express");
 const app = require("../app");
 
 module.exports = function (router, primaryUrl, model, bases) {
-    function middlewareCheckRequiredFound(req, res, next) {
-        let base;
-        const promises = [];
+    async function middlewareCheckRequiredFound(req, res, next) {
+        let base, entry;
 
         // Add all bases to the URL
         for (let i = 0; i < bases.length; ++i) {
             base = bases[i];
-            promises.push(base.findByPk(req.params[base.fieldName]));
+            entry = await base.model.findByPk(req.params[base.fieldName]);
+
+            if (!entry) {
+                app.throwNotFound(next);
+                return;
+            }
         }
 
-
-        app.query(next, Promise(promises).all(), values => {
-            // If we found all the parents, we can continue.
-            if (utils.allTrue(values)) {
-                next();
-            }
-            else {
-                app.throwNotFound(next);
-            }
-        });
+        next();
     }
 
     if (bases.length > 0) {
