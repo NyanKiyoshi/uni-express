@@ -18,19 +18,40 @@ beforeEach(async function () {
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.mailAddress.MailAddress.create({
+        models.persons.Person.create({
             id: 1,
             type: "work",
-            address: "miss@example.com",
+            number: "+33 6 00 00 00",
             PersonId: 2
-        })
+        });
     })
 });
 
-
-exports.inexisting_should_person_return_404 = function(done){
+exports.listing_persons_returns_valid = function(done){
     supertest(app)
-        .get('/persons/555/mailAddress')
+        .get('/persons')
+        .expect(200)
+        .expect("Content-Type", /^application\/json/)
+        .end(function(err, response){
+            assert.ifError(err);
+
+            const body = JSON.parse(response.text);
+
+            assert.strictEqual(typeof body, typeof []);
+            assert.strictEqual(body.length, 2);
+
+            const data = body[0];
+            assert.strictEqual(data["firstname"], "John");
+            assert.strictEqual(data["lastname"], "Doe");
+
+            return done();
+        });
+};
+
+
+exports.getting_inexisting_person = function(done){
+    supertest(app)
+        .get('/persons/555')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -43,9 +64,26 @@ exports.inexisting_should_person_return_404 = function(done){
         });
 };
 
-exports.person_without_mail_address_should_return_empty = function(done){
+exports.filter_persons_valid_return = function(done){
     supertest(app)
-        .get('/persons/1/mailAddress')
+        .get('/persons?lastname=Doe')
+        .expect(200)
+        .expect("Content-Type", /^application\/json/)
+        .end(function(err, response){
+            assert.ifError(err);
+
+            const body = JSON.parse(response.text);
+
+            assert.strictEqual(typeof body, typeof []);
+            assert.strictEqual(body.length, 1);
+
+            return done();
+        });
+};
+
+exports.filters_persons_invalid_filter = function(done){
+    supertest(app)
+        .get('/persons?lastname=Doh')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -60,30 +98,27 @@ exports.person_without_mail_address_should_return_empty = function(done){
         });
 };
 
-exports.person_with_mail_address_should_not_return_empty = function(done){
+exports.create_new_person = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress')
-        .expect(200)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .post('/persons')
+        .send({"firstname": "work", "lastname": "002"})
+        .expect(201)
+        .end(async function (err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
 
-            assert.strictEqual(typeof body, typeof []);
-            assert.strictEqual(body.length, 1);
-
-            const data = body[0];
-            assert.strictEqual(data["type"], "work");
-            assert.strictEqual(data["address"], "miss@example.com");
+            assert.strictEqual(body["firstname"], "work");
+            assert.strictEqual(body["lastname"], "002");
 
             return done();
         });
 };
 
-exports.get_inexisting_address = function(done){
+exports.update_inexisting_person = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress/12')
+        .put('/persons/555')
+        .send({"firstname": "home", "lastname": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -96,57 +131,26 @@ exports.get_inexisting_address = function(done){
         });
 };
 
-exports.get_existing_address = function(done){
+exports.update_existing_person = function(done){
     supertest(app)
-        .get('/persons/2/mailAddress/1')
-        .expect(200)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-            assert.strictEqual(body["type"], "work");
-            assert.strictEqual(body["address"], "miss@example.com");
-
-            return done();
-        });
-};
-
-exports.update_inexisting_address = function(done){
-    supertest(app)
-        .put('/persons/2/mailAddress/12')
-        .expect(404)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-            assert.strictEqual(body['error']['status'], 404);
-
-            return done();
-        });
-};
-
-exports.update_existing_address = function(done){
-    supertest(app)
-        .put('/persons/2/mailAddress/1')
-        .send({"type": "home", "address": "miss2@example.com"})
+        .put('/persons/1')
+        .send({"firstname": "home", "lastname": "016"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.mailAddress.MailAddress.findByPk(1).then(value => {
-                assert.strictEqual(value.get("type"), "home");
-                assert.strictEqual(value.get("address"), "miss2@example.com");
-            });
+            await models.persons.Person.findByPk(1).then(value => {
+                assert.strictEqual(value.get("firstname"), "home");
+                assert.strictEqual(value.get("lastname"), "016");
+            }).catch(assert.ifError);
 
             return done();
         });
 };
 
-exports.delete_inexisting_address = function(done){
+exports.delete_inexisting_person = function(done){
     supertest(app)
-        .delete('/persons/2/mailAddress/12')
+        .delete('/persons/20')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -159,14 +163,14 @@ exports.delete_inexisting_address = function(done){
         });
 };
 
-exports.delete_existing_address = function(done){
+exports.delete_existing_number = function(done){
     supertest(app)
-        .delete('/persons/2/mailAddress/1')
+        .delete('/persons/1')
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.mailAddress.MailAddress.findByPk(1).then(value => {
+            await models.persons.Person.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

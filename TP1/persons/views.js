@@ -3,10 +3,10 @@ const models = require("../models");
 const app = config.app;
 const Person = models.persons.Person;
 
-function _parseBody(body, next) {
+function _parseBody(request, next) {
     const query = {
-        firstname: body.firstname,
-        lastname: body.lastname
+        firstname: request.body.firstname,
+        lastname: request.body.lastname
     };
 
     if (!(query.firstname && query.lastname)) {
@@ -18,14 +18,38 @@ function _parseBody(body, next) {
     return [query, null]
 }
 
+function _handleForm(request, next, validFunc) {
+    const body = {
+        firstname: request.body.firstname,
+        lastname: request.body.lastname
+    };
+
+    if (!(body.firstname && body.lastname)) {
+        next({
+            status: 400,
+            message: "Missing field(s)."
+        })
+    } else {
+        validFunc(body);
+    }
+}
+
 module.exports.index = function (request, response) {
-    app.query(response, Person.all(), persons => {
+    let query = {
+        "where": {
+        }
+    };
+    if (request.query.lastname) {
+        query["where"]["lastname"] = request.query.lastname;
+    }
+
+    app.query(response, Person.findAll(query), persons => {
         response.json(persons);
     })
 };
 
 module.exports.createPerson = function (request, response, next) {
-    const [query, error] = _parseBody(request.body, next);
+    const [query, error] = _parseBody(request, next);
 
     if (error) {
         next({
@@ -43,12 +67,11 @@ module.exports.createPerson = function (request, response, next) {
 };
 
 function _getPersonQueryFromRequest(request) {
-    const personId = request.params.personId;
     return {
         where: {
-            id: personId
+            id: request.params.personId
         }
-    }
+    };
 }
 
 function _usePersonFromRequest(request, response, next, queryMethod) {
@@ -56,8 +79,8 @@ function _usePersonFromRequest(request, response, next, queryMethod) {
         next,
         queryMethod(_getPersonQueryFromRequest(request)),
         results => {
-            if (results) {
-                response.send(results);
+            if (results || (results.length > 0 && results[0])) {
+                response.json(results);
             }
             else {
                 app.throwNotFound(next);
@@ -73,22 +96,19 @@ module.exports.getPerson = function (request, response, next) {
 };
 
 module.exports.updatePerson = function (request, response, next) {
-    const [query, error] = _parseBody(request.body, next);
+    _handleForm(request, next, function (body) {
+        app.query(
+            next,
 
-    if (error) {
-        next({
-            status: 400,
-            message: error
-        });
-    }
-    else {
-        _usePersonFromRequest(
-            request, response, next,
-            params => {
-                return Person.update(query, params).then(
-                    _ => Person.findOne(params));
-            });
-    }
+            Person.update(body, _getPersonQueryFromRequest(request)),
+
+            results => {
+                (!(results && results[0]))
+                    ? app.throwNotFound(next)
+                    : response.status("204").end();
+            }
+        );
+    });
 };
 
 module.exports.deletePerson = function (request, response, next) {

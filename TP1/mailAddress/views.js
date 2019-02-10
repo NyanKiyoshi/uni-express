@@ -18,6 +18,10 @@ function _getWhereParamsFromRequest(request) {
         body["where"]["id"] = mailId;
     }
 
+    if (request.query.type) {
+        body["where"]["type"] = request.query.type;
+    }
+
     return body;
 }
 
@@ -81,7 +85,7 @@ module.exports.updateEmail = function (request, response, next) {
                 app.throwNotFound(next);
             }
             else {
-                response.status("204").send("");
+                response.status("204").end();
             }
         });
 };
@@ -95,7 +99,7 @@ module.exports.deleteEmail = function (request, response, next) {
                 app.throwNotFound(next);
             }
             else {
-                response.status("204").send("");
+                response.status("204").end();
             }
         });
 };
