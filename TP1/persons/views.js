@@ -1,6 +1,5 @@
-const config = require("../config");
 const models = require("../models");
-const app = config.app;
+const app = require("../app");
 const Person = models.persons.Person;
 
 function _parseBody(request, next) {

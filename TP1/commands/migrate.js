@@ -1,7 +1,7 @@
-const config = require("../config");
+const db = require("../db");
 const models = require("../models");
 
-config.db.sync().then(value => {
+db.sync().then(value => {
     models.persons.Person.create({
         firstname: "John",
         lastname: "Doe"

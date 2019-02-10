@@ -1,7 +1,6 @@
-const config = require("./config");
+const app = require("./app");
 const models = require("./models");
 const middlewares = require("./middlewares");
-const app = config.app;
 
 const routesPersons = require("./persons/routes");
 const routesMailAddresses = require("./mailAddress/routes");
