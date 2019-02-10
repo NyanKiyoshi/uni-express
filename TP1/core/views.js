@@ -58,7 +58,7 @@ module.exports = function (model, endpointName, parentField, formFields, filterF
         // If the model has a parent,
         // we set the children to be parent of it
         if (parentField) {
-            formBody[parentField] = request.arguments[parentField];
+            formBody[parentField] = request.params[parentField];
         }
 
         validFunc(formBody);

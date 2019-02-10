@@ -8,17 +8,17 @@ const _ = require("../routes");
 
 beforeEach(async function () {
     await db.sync({ force: true }).then(value => {
-        models.persons.Person.create({
+        models.Person.create({
             id: 1,
             firstname: "John",
             lastname: "Doe"
         });
-        models.persons.Person.create({
+        models.Person.create({
             id: 2,
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.phones.Phone.create({
+        models.Phone.create({
             id: 1,
             type: "work",
             number: "+33 6 00 00 00",
@@ -43,7 +43,7 @@ exports.inexisting_should_person_return_404 = function(done){
         });
 };
 
-exports.person_without_phone_number_should_return_empty = function(done){
+exports.person_without_number_should_return_empty = function(done){
     supertest(app)
         .get('/persons/1/phones')
         .expect(200)
@@ -60,7 +60,7 @@ exports.person_without_phone_number_should_return_empty = function(done){
         });
 };
 
-exports.person_with_phone_number_should_not_return_empty = function(done){
+exports.person_with_number_should_not_return_empty = function(done){
     supertest(app)
         .get('/persons/2/phones')
         .expect(200)
@@ -81,7 +81,7 @@ exports.person_with_phone_number_should_not_return_empty = function(done){
         });
 };
 
-exports.filter_phone_numbers_valid_return = function(done){
+exports.filter_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/phones?type=work')
         .expect(200)
@@ -98,7 +98,7 @@ exports.filter_phone_numbers_valid_return = function(done){
         });
 };
 
-exports.filter_phone_numbers_valid_return = function(done){
+exports.filter_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/phones?type=home')
         .expect(200)
@@ -146,11 +146,11 @@ exports.get_existing_number = function(done){
         });
 };
 
-exports.create_new_phone_number = function(done){
+exports.create_new_number = function(done){
     supertest(app)
         .post('/persons/2/phones')
-        .send({"phone_type": "work", "phone_number": "+23"})
-        .expect(200)
+        .send({"type": "work", "number": "+23"})
+        .expect(201)
         .end(async function (err, response) {
             assert.ifError(err);
 
@@ -167,7 +167,7 @@ exports.create_new_phone_number = function(done){
 exports.update_inexisting_number = function(done){
     supertest(app)
         .put('/persons/2/phones/12')
-        .send({"phone_type": "home", "phone_number": "+22 0000"})
+        .send({"type": "home", "number": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -183,12 +183,12 @@ exports.update_inexisting_number = function(done){
 exports.update_existing_number = function(done){
     supertest(app)
         .put('/persons/2/phones/1')
-        .send({"phone_type": "home", "phone_number": "+22 0000"})
+        .send({"type": "home", "number": "+22 0000"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.phones.Phone.findByPk(1).then(value => {
+            await models.Phone.findByPk(1).then(value => {
                 assert.strictEqual(value.get("PersonId"), 2);
                 assert.strictEqual(value.get("type"), "home");
                 assert.strictEqual(value.get("number"), "+22 0000");
@@ -220,7 +220,7 @@ exports.delete_existing_number = function(done){
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.phones.Phone.findByPk(1).then(value => {
+            await models.Phone.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

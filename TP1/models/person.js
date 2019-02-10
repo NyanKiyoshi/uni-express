@@ -6,4 +6,4 @@ const Person = db.define('Person', {
     lastname: Sequelize.STRING
 });
 
-module.exports.Person = Person;
+module.exports = Person;

@@ -8,17 +8,17 @@ const _ = require("../routes");
 
 beforeEach(async function () {
     await db.sync({ force: true }).then(value => {
-        models.persons.Person.create({
+        models.Person.create({
             id: 1,
             firstname: "John",
             lastname: "Doe"
         });
-        models.persons.Person.create({
+        models.Person.create({
             id: 2,
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.persons.Person.create({
+        models.Person.create({
             id: 1,
             type: "work",
             number: "+33 6 00 00 00",
@@ -139,7 +139,7 @@ exports.update_existing_person = function(done){
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.persons.Person.findByPk(1).then(value => {
+            await models.Person.findByPk(1).then(value => {
                 assert.strictEqual(value.get("firstname"), "home");
                 assert.strictEqual(value.get("lastname"), "016");
             }).catch(assert.ifError);
@@ -170,7 +170,7 @@ exports.delete_existing_number = function(done){
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.persons.Person.findByPk(1).then(value => {
+            await models.Person.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

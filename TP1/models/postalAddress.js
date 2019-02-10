@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require("../db");
-const Person = require("../persons/models").Person;
+const Person = require("./person");
 
 const PostalAddress = db.define("PostalAddress", {
     type: {
@@ -16,4 +16,4 @@ const PostalAddress = db.define("PostalAddress", {
 Person.hasMany(PostalAddress, {as: "postalAddresses", onDelete: "CASCADE"});
 PostalAddress.belongsTo(Person, { onDelete: 'CASCADE' });
 
-module.exports.PostalAddress = PostalAddress;
+module.exports = PostalAddress;

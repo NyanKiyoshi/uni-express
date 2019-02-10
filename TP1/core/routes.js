@@ -1,5 +1,6 @@
 const express = require("express");
 const middlewares = require("./middlewares");
+const utils = require("./utils");
 
 const REQUIRED_BASE_MODEL_DEF_FIELDS = [
     "pointName", "model", "fieldName"
@@ -18,13 +19,12 @@ function buildUrl(endpointName, bases) {
         if (!utils.allFields(base, REQUIRED_BASE_MODEL_DEF_FIELDS)) {
             throw "Missing field. Invalid configuration.";
         }
-        baseUrl += base.pointName + "/:" + base.fieldName;
+        baseUrl += "/" + base.pointName + "/:" + base.fieldName;
     }
 
     baseUrl += "/" + endpointName;
     return baseUrl;
 }
-
 
 module.exports = function (views, endpointName, model, bases) {
     const primaryUrl = buildUrl(endpointName, bases);
