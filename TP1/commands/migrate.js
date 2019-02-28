@@ -1,13 +1,18 @@
 const db = require("../db");
 const models = require("../models");
 
-db.sync({ force: true }).then(value => {
-    models.Person.create({
+db.sync({ force: true }).then(async value => {
+    const person = await models.Person.create({
         firstname: "John",
         lastname: "Doe"
     });
-    models.Group.create({
+
+    const group = await models.Group.create({
         title: "Dummy Group"
-    })
+    });
+
+    person.setGroups([group]).error(err => {
+        console.log(err)
+    });
 }).catch(
     reason => console.error(reason));

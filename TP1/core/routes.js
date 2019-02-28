@@ -1,6 +1,7 @@
 const express = require("express");
 const middlewares = require("./middlewares");
 const utils = require("./utils");
+const sprintf = require("sprintf-js").sprintf;
 
 const REQUIRED_BASE_MODEL_DEF_FIELDS = [
     "pointName", "model", "fieldName"
@@ -16,7 +17,8 @@ function buildUrl(endpointName, bases) {
     // Add all bases to the URL
     for (let i = 0; i < bases.length; ++i) {
         base = bases[i];
-        utils.assertAllFields(base, REQUIRED_BASE_MODEL_DEF_FIELDS);
+        utils.assertAllFields(
+            base, REQUIRED_BASE_MODEL_DEF_FIELDS, "A base is invalid");
         baseUrl += "/" + base.pointName + "/:" + base.fieldName;
     }
 
@@ -24,7 +26,38 @@ function buildUrl(endpointName, bases) {
     return baseUrl;
 }
 
-module.exports = function (cfg, views) {
+const REQUIRED_ROUTE_FIELDS = [
+    "path", "method", "handler"
+];
+
+function registerRoutes(router, viewBuilderUtils, routePrefix, newRoutes) {
+    let handler;
+    let meth;
+
+    newRoutes.forEach(function (specs) {
+        // Ensure the route is correctly set-up
+        utils.assertAllFields(
+            specs, REQUIRED_ROUTE_FIELDS, "The specs of a route are invalid.");
+
+        // Normalize the HTTP method
+        meth = specs.method.toLowerCase();
+
+        // Check if the router has an handler for the requested HTTP method.
+        // Note that we do not retrieve the handler as it would make the router
+        // object's `this` object undefined (for some reasons).
+        //
+        // If not found, raise an error.
+        handler = router.hasOwnProperty(meth);
+        if (handler === undefined) {
+            throw sprintf(`No such method '${specs.method}' (requested by '${specs.path}')`)
+        }
+
+        // Register the new route, and invoke the wrapped handler
+        router[meth](routePrefix + "/" + specs.path, specs.handler(viewBuilderUtils))
+    });
+}
+
+module.exports = function (cfg, views, viewBuilders) {
     const primaryUrl = buildUrl(cfg.endpoint, cfg.bases);
     const secondaryUrl = primaryUrl + "/:" + cfg.endpoint;
 
@@ -41,6 +74,10 @@ module.exports = function (cfg, views) {
     router.get(secondaryUrl, views.getOne);
     router.put(secondaryUrl, views.updateOne);
     router.delete(secondaryUrl, views.deleteOne);
+
+    // Register additional handlers
+    registerRoutes(router, viewBuilders, primaryUrl, cfg.primaryAdditionalRoutes);
+    registerRoutes(router, viewBuilders, secondaryUrl, cfg.secondaryAdditionalRoutes);
 
     return router;
 };

@@ -1,6 +1,7 @@
 const app = require("./app");
 const models = require("./models");
 const RESTFulManager = require("./core/controller");
+const groupsViews = require("./views/groups");
 
 app.use("/", RESTFulManager({
     model: models.Person,
@@ -81,7 +82,13 @@ app.use("/", RESTFulManager({
     ],
     filterFields: [
         "title"
-    ]
+    ],
+
+    secondaryAdditionalRoutes: [{
+        method: "GET",
+        path: "persons",
+        handler: groupsViews.getGroupPersons
+    }]
 }));
 
 // Define the error middleware

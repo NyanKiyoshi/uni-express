@@ -1,14 +1,11 @@
 const app = require("../app");
-const buildersConstructor = require("./builders");
 
 const HTTP_CONTENT_CREATED_STATUS = 201;
 const HTTP_CONTENT_UPDATED_STATUS = 204;
 
-module.exports = function (cfg) {
+module.exports = function (cfg, builders) {
     const model = cfg.model;
     const views = {};
-    const builders = buildersConstructor(
-        cfg.endpoint, cfg.parentFieldName, cfg.formFields, cfg.filterFields);
 
     views.getIndex = function (request, response, next) {
         app.query(next, model.findAll(builders.buildWhereRequest(request)), results => {

@@ -1,5 +1,6 @@
 const viewsBuilder = require("./views");
 const routeBuilder = require("./routes");
+const viewBuildersConstructor = require("./builders");
 const utils = require("./utils");
 
 const configurationSpecs = {
@@ -33,12 +34,33 @@ const configurationSpecs = {
 
     // Defines the parent of the model we are routing.
     "parentFieldName": {
-        type: String,
+        type: "string",
         lazyDefault: function (cfg) {
             return cfg.bases.length > 0
                 ? cfg.bases[cfg.bases.length - 1].fieldName
                 : null;
         }
+    },
+
+    // Defines additional routes to handle and pass the REST manager.
+    // This must be of the format:
+    // [
+    //    {
+    //        path: "my-sub-route/blah/blah"
+    //        method: "GET",
+    //        handler: (utils) =>
+    //                    (request, response, next) => handler...
+    //    }
+    // ]
+    "primaryAdditionalRoutes": {
+        type: "object",
+        default: []
+    },
+
+    // Same as 'primaryAdditionalRoutes'
+    "secondaryAdditionalRoutes": {
+        type: "object",
+        default: []
     }
 };
 
@@ -61,6 +83,9 @@ module.exports = function (cfg) {
     // Ensure the configuration is valid and set the default values
     utils.implementSpecs(cfg, configurationSpecs);
 
-    const internalViews = viewsBuilder(cfg);
-    return routeBuilder(cfg, internalViews);
+    const viewBuilders = viewBuildersConstructor(
+        cfg.endpoint, cfg.parentFieldName, cfg.formFields, cfg.filterFields);
+
+    const internalViews = viewsBuilder(cfg, viewBuilders);
+    return routeBuilder(cfg, internalViews, viewBuilders);
 };

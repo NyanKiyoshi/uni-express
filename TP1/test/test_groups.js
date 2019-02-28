@@ -7,26 +7,30 @@ const app = require('../app');
 const _ = require("../routes");
 
 beforeEach(async function () {
-    await db.sync({ force: true }).then(value => {
-        models.Person.create({
+    await db.sync({ force: true }).then(async value => {
+        const personWithoutGroup = await models.Person.create({
             id: 1,
             firstname: "John",
             lastname: "Doe"
         });
-        models.Person.create({
+
+        const personWithGroup = await models.Person.create({
             id: 2,
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.Group.create({
+
+        const groupWithPersons = await models.Group.create({
             id: 1,
-            title: "group_1",
-            PersonIds: [2]
+            title: "group_1"
         });
-        models.Group.create({
+
+        const emptyGroup = await models.Group.create({
             id: 2,
             title: "group_2"
         });
+
+        await groupWithPersons.addPerson(personWithGroup);
     })
 });
 
@@ -93,7 +97,7 @@ exports.group_without_persons_should_return_empty = function(done) {
         });
 };
 
-exports.person_with_number_should_not_return_empty = function(done) {
+exports.group_with_persons_should_not_return_empty = function(done) {
     supertest(app)
         .get('/groups/1/persons')
         .expect(200)
@@ -107,7 +111,7 @@ exports.person_with_number_should_not_return_empty = function(done) {
             assert.strictEqual(body.length, 1);
 
             // Check the person is the expected one
-            assert.strictEqual(body[0]["id"], 1);
+            assert.strictEqual(body[0]["id"], 2);
 
             return done();
         });

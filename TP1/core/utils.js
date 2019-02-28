@@ -42,10 +42,10 @@ meths.allFields = function (obj, fields) {
  * @param obj
  * @param fields
  */
-meths.assertAllFields = function (obj, fields) {
+meths.assertAllFields = function (obj, fields, help) {
     const missingField = meths.allFields(obj, fields);
     if (missingField) {
-        throw "Invalid configuration, a field is missing: " + missingField;
+        throw help + " A field is missing: " + missingField;
     }
 };
 

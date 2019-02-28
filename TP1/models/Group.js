@@ -11,16 +11,43 @@ const Group = db.define("Group", {
     },
     title: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
     }
 });
 
+const PersonHasGroup = db.define('PersonHasGroup', {
+    personId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        field: 'person_id'
+    },
+    groupId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        field: 'group_id'
+    }
+}, {
+    tableName: 'tbl_person_has_group',
+    indexes: [
+        {
+            unique: true,
+            fields: ['group_id', 'person_id']
+        }
+    ]
+});
+
 Person.belongsToMany(Group, {
-    through: Group
+    as: "groups",
+    through: PersonHasGroup,
+    foreignKey: 'personId',
+    sourceKey: 'personId'
 });
 Group.belongsToMany(Person, {
-    through: Group
+    as: "persons",
+    through: PersonHasGroup,
+    foreignKey: 'groupId',
+    targetKey: 'personId'
 });
 
 module.exports = Group;
