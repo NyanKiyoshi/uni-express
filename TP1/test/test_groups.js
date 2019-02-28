@@ -34,7 +34,6 @@ beforeEach(async function () {
     })
 });
 
-
 exports.get_inexisting_group_returns_404 = function(done) {
     supertest(app)
         .get('/groups/555')

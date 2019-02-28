@@ -3,6 +3,7 @@ const models = require("./models");
 const RESTFulManager = require("./core/controller");
 const groupsViews = require("./views/groups");
 
+// Register REST CRUD for /persons/:person/...
 app.use("/", RESTFulManager({
     model: models.Person,
     endpoint: "persons",
@@ -16,6 +17,7 @@ app.use("/", RESTFulManager({
     ]
 }));
 
+// Register REST CRUD for /persons/:person/mailAddresses/:mail/...
 app.use("/", RESTFulManager({
     model: models.MailAddress,
     endpoint: "mailAddresses",
@@ -35,6 +37,7 @@ app.use("/", RESTFulManager({
     ]
 }));
 
+// Register REST CRUD for /persons/:person/phones/:phone/...
 app.use("/", RESTFulManager({
     model: models.Phone,
     endpoint: "phones",
@@ -54,6 +57,7 @@ app.use("/", RESTFulManager({
     ]
 }));
 
+// Register REST CRUD for /persons/:person/postalAddresses/:postalAddr/...
 app.use("/", RESTFulManager({
     model: models.PostalAddress,
     endpoint: "postalAddresses",
@@ -73,6 +77,30 @@ app.use("/", RESTFulManager({
     ]
 }));
 
+// Register REST CRUD for /persons/:person/groups/:group/...
+app.use("/", RESTFulManager({
+    model: models.Group,
+    endpoint: "groups",
+    assocName: "groups",
+    assocModel: models.PersonHasGroup,
+    is_many_to_many: true,
+
+    bases: [{
+        "pointName": "persons",
+        "model": models.Person,
+        "fieldName": "personId"
+    }],
+
+    formFields: [
+        "type",
+        "address"
+    ],
+    filterFields: [
+        "type"
+    ]
+}));
+
+// Register REST CRUD for /groups/:group/...
 app.use("/", RESTFulManager({
     model: models.Group,
     endpoint: "groups",

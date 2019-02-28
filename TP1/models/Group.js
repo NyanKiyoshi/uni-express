@@ -16,38 +16,4 @@ const Group = db.define("Group", {
     }
 });
 
-const PersonHasGroup = db.define('PersonHasGroup', {
-    personId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        field: 'person_id'
-    },
-    groupId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        field: 'group_id'
-    }
-}, {
-    tableName: 'tbl_person_has_group',
-    indexes: [
-        {
-            unique: true,
-            fields: ['group_id', 'person_id']
-        }
-    ]
-});
-
-Person.belongsToMany(Group, {
-    as: "groups",
-    through: PersonHasGroup,
-    foreignKey: 'personId',
-    sourceKey: 'personId'
-});
-Group.belongsToMany(Person, {
-    as: "persons",
-    through: PersonHasGroup,
-    foreignKey: 'groupId',
-    targetKey: 'personId'
-});
-
 module.exports = Group;

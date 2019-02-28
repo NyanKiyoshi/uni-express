@@ -30,6 +30,12 @@ const REQUIRED_ROUTE_FIELDS = [
     "path", "method", "handler"
 ];
 
+function registerHandler(router, method, path, handler) {
+    if (handler) {
+        router[method](path, handler)
+    }
+}
+
 function registerRoutes(router, viewBuilderUtils, routePrefix, newRoutes) {
     let handler;
     let meth;
@@ -53,11 +59,11 @@ function registerRoutes(router, viewBuilderUtils, routePrefix, newRoutes) {
         }
 
         // Register the new route, and invoke the wrapped handler
-        router[meth](routePrefix + "/" + specs.path, specs.handler(viewBuilderUtils))
+        registerHandler(routePrefix + "/" + specs.path, specs.handler(viewBuilderUtils))
     });
 }
 
-module.exports = function (cfg, views, viewBuilders) {
+module.exports = function (cfg, views, viewUtils) {
     const primaryUrl = buildUrl(cfg.endpoint, cfg.bases);
     const secondaryUrl = primaryUrl + "/:" + cfg.endpoint;
 
@@ -67,17 +73,18 @@ module.exports = function (cfg, views, viewBuilders) {
     middlewares(router, primaryUrl, cfg.model, cfg.bases);
 
     // Define the root routes
-    router.get(primaryUrl, views.getIndex);
-    router.post(primaryUrl, views.createOne);
+    registerHandler(router, "get", primaryUrl, views.getIndex);
+    registerHandler(router, "post", primaryUrl, views.createOne);
 
     // Define the secondary routes (getter and setters)
-    router.get(secondaryUrl, views.getOne);
-    router.put(secondaryUrl, views.updateOne);
-    router.delete(secondaryUrl, views.deleteOne);
+    registerHandler(router, "get", secondaryUrl, views.getOne);
+    registerHandler(router, "put", secondaryUrl, views.updateOne);
+    registerHandler(router, "post", secondaryUrl, views.createAssoc);
+    registerHandler(router, "delete", secondaryUrl, views.deleteOne);
 
     // Register additional handlers
-    registerRoutes(router, viewBuilders, primaryUrl, cfg.primaryAdditionalRoutes);
-    registerRoutes(router, viewBuilders, secondaryUrl, cfg.secondaryAdditionalRoutes);
+    registerRoutes(router, viewUtils, primaryUrl, cfg.primaryAdditionalRoutes);
+    registerRoutes(router, viewUtils, secondaryUrl, cfg.secondaryAdditionalRoutes);
 
     return router;
 };

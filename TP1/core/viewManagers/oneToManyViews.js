@@ -1,4 +1,4 @@
-const app = require("../app");
+const app = require("../../app");
 
 const HTTP_CONTENT_CREATED_STATUS = 201;
 const HTTP_CONTENT_UPDATED_STATUS = 204;

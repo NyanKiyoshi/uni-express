@@ -6,6 +6,10 @@ db.sync({ force: true }).then(async value => {
         firstname: "John",
         lastname: "Doe"
     });
+    const person2 = await models.Person.create({
+        firstname: "Me",
+        lastname: "Too"
+    });
 
     const group = await models.Group.create({
         title: "Dummy Group"

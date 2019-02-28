@@ -11,6 +11,8 @@ module.exports = function (endpointName, parentField, formFields, filterFields) 
                 baseWhereObj[filterField] = request.query[filterField];
             }
         }
+
+        return baseWhereObj;
     };
 
     builders.buildWhereRequest = function(request) {

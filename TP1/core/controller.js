@@ -1,12 +1,20 @@
-const viewsBuilder = require("./views");
+const oneToManyViews = require("./viewManagers/oneToManyViews");
+const manyToManyViews = require("./viewManagers/manyToManyViews");
 const routeBuilder = require("./routes");
-const viewBuildersConstructor = require("./builders");
+const oneToManyUtils = require("./viewUtils/oneToManyUtils");
+const manyToManyUtils = require("./viewUtils/manyToManyUtils");
 const utils = require("./utils");
 
 const configurationSpecs = {
     // Defines the model to generate REST from.
     "model": {
         type: "function"
+    },
+
+    // Defines the model structure to use for the REST handling.
+    "is_many_to_many": {
+        type: "boolean",
+        default: false
     },
 
     // Defines the REST start endpoint.
@@ -83,9 +91,22 @@ module.exports = function (cfg) {
     // Ensure the configuration is valid and set the default values
     utils.implementSpecs(cfg, configurationSpecs);
 
-    const viewBuilders = viewBuildersConstructor(
+    const viewUtils = oneToManyUtils(
         cfg.endpoint, cfg.parentFieldName, cfg.formFields, cfg.filterFields);
+    let internalViews;
 
-    const internalViews = viewsBuilder(cfg, viewBuilders);
-    return routeBuilder(cfg, internalViews, viewBuilders);
+    if (cfg.is_many_to_many) {
+        if (!cfg.bases) {
+            throw "Many to Many REST requires bases."
+        }
+
+        manyToManyUtils(viewUtils, cfg);
+        internalViews = manyToManyViews(cfg, viewUtils);
+    }
+    else {
+        internalViews = oneToManyViews(cfg, viewUtils);
+    }
+
+
+    return routeBuilder(cfg, internalViews, viewUtils);
 };
