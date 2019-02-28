@@ -155,6 +155,7 @@ exports.create_new_number = function(done){
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
+            console.log(body);
 
             assert.strictEqual(body["PersonId"], "2");
             assert.strictEqual(body["type"], "work");

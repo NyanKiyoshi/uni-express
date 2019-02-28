@@ -2,81 +2,87 @@ const app = require("./app");
 const models = require("./models");
 const RESTFulManager = require("./core/controller");
 
-app.use("/", RESTFulManager(
-    // Model
-    models.Person,
+app.use("/", RESTFulManager({
+    model: models.Person,
+    endpoint: "persons",
 
-    // Endpoint
-    "persons",
+    formFields: [
+        "firstname",
+        "lastname"
+    ],
+    filterFields: [
+        "lastname"
+    ]
+}));
 
-    // Bases
-    {},
+app.use("/", RESTFulManager({
+    model: models.MailAddress,
+    endpoint: "mailAddresses",
 
-    // Fields
-    ["firstname", "lastname"],
-
-    // Searchable fields
-    ["lastname"]));
-
-app.use("/", RESTFulManager(
-    // Model
-    models.MailAddress,
-
-    // Endpoint
-    "mailAddresses",
-
-    // Bases
-    [{
+    bases: [{
         "pointName": "persons",
         "model": models.Person,
         "fieldName": "PersonId"
     }],
 
-    // Fields
-    ["type", "address"],
+    formFields: [
+        "type",
+        "address"
+    ],
+    filterFields: [
+        "type"
+    ]
+}));
 
-    // Searchable fields
-    ["type"]));
+app.use("/", RESTFulManager({
+    model: models.Phone,
+    endpoint: "phones",
 
-app.use("/", RESTFulManager(
-    // Model
-    models.Phone,
-
-    // Endpoint
-    "phones",
-
-    // Bases
-    [{
+    bases: [{
         "pointName": "persons",
         "model": models.Person,
         "fieldName": "PersonId"
     }],
 
-    // Fields
-    ["type", "number"],
+    formFields: [
+        "type",
+        "number"
+    ],
+    filterFields: [
+        "type"
+    ]
+}));
 
-    // Searchable fields
-    ["type"]));
+app.use("/", RESTFulManager({
+    model: models.PostalAddress,
+    endpoint: "postalAddresses",
 
-app.use("/", RESTFulManager(
-    // Model
-    models.PostalAddress,
-
-    // Endpoint
-    "postalAddresses",
-
-    // Bases
-    [{
+    bases: [{
         "pointName": "persons",
         "model": models.Person,
         "fieldName": "PersonId"
     }],
 
-    // Fields
-    ["type", "address"],
+    formFields: [
+        "type",
+        "address"
+    ],
+    filterFields: [
+        "type"
+    ]
+}));
 
-    // Searchable fields
-    ["type"]));
+app.use("/", RESTFulManager({
+    model: models.Group,
+    endpoint: "groups",
+
+    formFields: [
+        "title"
+    ],
+    filterFields: [
+        "title"
+    ]
+}));
 
 // Define the error middleware
 app.use(app.errorHandler);

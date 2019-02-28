@@ -16,9 +16,7 @@ function buildUrl(endpointName, bases) {
     // Add all bases to the URL
     for (let i = 0; i < bases.length; ++i) {
         base = bases[i];
-        if (!utils.allFields(base, REQUIRED_BASE_MODEL_DEF_FIELDS)) {
-            throw "Missing field. Invalid configuration.";
-        }
+        utils.assertAllFields(base, REQUIRED_BASE_MODEL_DEF_FIELDS);
         baseUrl += "/" + base.pointName + "/:" + base.fieldName;
     }
 
@@ -26,14 +24,14 @@ function buildUrl(endpointName, bases) {
     return baseUrl;
 }
 
-module.exports = function (views, endpointName, model, bases) {
-    const primaryUrl = buildUrl(endpointName, bases);
-    const secondaryUrl = primaryUrl + "/:" + endpointName;
+module.exports = function (cfg, views) {
+    const primaryUrl = buildUrl(cfg.endpoint, cfg.bases);
+    const secondaryUrl = primaryUrl + "/:" + cfg.endpoint;
 
     const router = express.Router();
 
     // Implement middlewares before URLs
-    middlewares(router, primaryUrl, model, bases);
+    middlewares(router, primaryUrl, cfg.model, cfg.bases);
 
     // Define the root routes
     router.get(primaryUrl, views.getIndex);

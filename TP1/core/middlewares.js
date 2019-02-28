@@ -1,4 +1,3 @@
-const express = require("express");
 const app = require("../app");
 
 module.exports = function (router, primaryUrl, model, bases) {
@@ -8,6 +7,7 @@ module.exports = function (router, primaryUrl, model, bases) {
         // Add all bases to the URL
         for (let i = 0; i < bases.length; ++i) {
             base = bases[i];
+            console.log(base.model.columns);
             entry = await base.model.findByPk(req.params[base.fieldName]);
 
             if (!entry) {

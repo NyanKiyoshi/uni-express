@@ -18,19 +18,22 @@ beforeEach(async function () {
             firstname: "Miss",
             lastname: "Da Two"
         });
-        models.MailAddress.create({
+        models.Group.create({
             id: 1,
-            type: "work",
-            address: "miss@example.com",
-            PersonId: 2
+            title: "group_1",
+            PersonIds: [2]
+        });
+        models.Group.create({
+            id: 2,
+            title: "group_2"
         });
     })
 });
 
 
-exports.inexisting_should_person_return_404 = function(done){
+exports.get_inexisting_group_returns_404 = function(done) {
     supertest(app)
-        .get('/persons/555/mailAddresses')
+        .get('/groups/555')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -43,9 +46,39 @@ exports.inexisting_should_person_return_404 = function(done){
         });
 };
 
-exports.person_without_mail_address_should_return_empty = function(done){
+exports.get_existing_group_returns_valid = function(done) {
     supertest(app)
-        .get('/persons/1/mailAddresses')
+        .get('/groups/1')
+        .expect(200)
+        .expect("Content-Type", /^application\/json/)
+        .end(function(err, response){
+            assert.ifError(err);
+
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["title"], "group_1");
+
+            return done();
+        });
+};
+
+exports.inexisting_persons_group_should_return_404 = function(done) {
+    supertest(app)
+        .get('/groups/555/persons')
+        .expect(404)
+        .expect("Content-Type", /^application\/json/)
+        .end(function(err, response){
+            assert.ifError(err);
+
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body['error']['status'], 404);
+
+            return done();
+        });
+};
+
+exports.group_without_persons_should_return_empty = function(done) {
+    supertest(app)
+        .get('/groups/2/persons')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -60,9 +93,9 @@ exports.person_without_mail_address_should_return_empty = function(done){
         });
 };
 
-exports.person_with_mail_address_should_not_return_empty = function(done){
+exports.person_with_number_should_not_return_empty = function(done) {
     supertest(app)
-        .get('/persons/2/mailAddresses')
+        .get('/groups/1/persons')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -73,101 +106,32 @@ exports.person_with_mail_address_should_not_return_empty = function(done){
             assert.strictEqual(typeof body, typeof []);
             assert.strictEqual(body.length, 1);
 
-            const data = body[0];
-            assert.strictEqual(data["type"], "work");
-            assert.strictEqual(data["address"], "miss@example.com");
+            // Check the person is the expected one
+            assert.strictEqual(body[0]["id"], 1);
 
             return done();
         });
 };
 
-exports.filter_email_numbers_valid_return = function(done){
+exports.create_new_group = function(done) {
     supertest(app)
-        .get('/persons/2/mailAddresses?type=work')
-        .expect(200)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-
-            assert.strictEqual(typeof body, typeof []);
-            assert.strictEqual(body.length, 1);
-
-            return done();
-        });
-};
-
-exports.filter_email_numbers_valid_return = function(done){
-    supertest(app)
-        .get('/persons/2/mailAddresses?type=home')
-        .expect(200)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-
-            assert.strictEqual(typeof body, typeof []);
-            assert.strictEqual(body.length, 0);
-
-            return done();
-        });
-};
-
-exports.get_inexisting_address = function(done){
-    supertest(app)
-        .get('/persons/2/mailAddresses/12')
-        .expect(404)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-            assert.strictEqual(body['error']['status'], 404);
-
-            return done();
-        });
-};
-
-exports.get_existing_address = function(done){
-    supertest(app)
-        .get('/persons/2/mailAddresses/1')
-        .expect(200)
-        .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
-            assert.ifError(err);
-
-            const body = JSON.parse(response.text);
-            assert.strictEqual(body["type"], "work");
-            assert.strictEqual(body["address"], "miss@example.com");
-
-            return done();
-        });
-};
-
-exports.create_new_email_number = function(done){
-    supertest(app)
-        .post('/persons/2/mailAddresses')
-        .send({"type": "work", "address": "miss3@example.com"})
+        .post('/groups')
+        .send({"title": "new group"})
         .expect(201)
         .end(async function (err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
-
-            assert.strictEqual(body["PersonId"], "2");
-            assert.strictEqual(body["type"], "work");
-            assert.strictEqual(body["address"], "miss3@example.com");
+            assert.strictEqual(body["title"], "new group");
 
             return done();
         });
 };
 
-exports.update_inexisting_address = function(done){
+exports.update_inexisting_group = function(done) {
     supertest(app)
-        .put('/persons/2/mailAddresses/12')
-        .send({"type": "home", "address": "miss2@example.com"})
+        .put('/groups/555')
+        .send({"title": "updated group"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -180,27 +144,25 @@ exports.update_inexisting_address = function(done){
         });
 };
 
-exports.update_existing_address = function(done){
+exports.update_existing_group = function(done) {
     supertest(app)
-        .put('/persons/2/mailAddresses/1')
-        .send({"type": "home", "address": "miss2@example.com"})
+        .put('/groups/1')
+        .send({"title": "updated group"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.MailAddress.findByPk(1).then(value => {
-                assert.strictEqual(value.get("PersonId"), 2);
-                assert.strictEqual(value.get("type"), "home");
-                assert.strictEqual(value.get("address"), "miss2@example.com");
-            });
+            await models.Group.findByPk(1).then(value => {
+                assert.strictEqual(value.get("title"), "updated group");
+            }).catch(assert.ifError);
 
             return done();
         });
 };
 
-exports.delete_inexisting_address = function(done){
+exports.delete_inexisting_group = function(done) {
     supertest(app)
-        .delete('/persons/2/mailAddresses/12')
+        .delete('/groups/555')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -213,14 +175,14 @@ exports.delete_inexisting_address = function(done){
         });
 };
 
-exports.delete_existing_address = function(done){
+exports.delete_existing_group = function(done) {
     supertest(app)
-        .delete('/persons/2/mailAddresses/1')
+        .delete('/groups/1')
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.MailAddress.findByPk(1).then(value => {
+            await models.Group.findByPk(1).then(value => {
                 assert.ok(!value);
             });
 

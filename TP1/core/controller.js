@@ -1,31 +1,66 @@
-const views = require("./views");
-const routes = require("./routes");
+const viewsBuilder = require("./views");
+const routeBuilder = require("./routes");
+const utils = require("./utils");
+
+const configurationSpecs = {
+    // Defines the model to generate REST from.
+    "model": {
+        type: "function"
+    },
+
+    // Defines the REST start endpoint.
+    "endpoint": {
+        type: "string"
+    },
+
+    // Defines the bases of the new REST endpoint.
+    "bases": {
+        type: "object",
+        default: []
+    },
+
+    // Defines the exposed form fields.
+    "formFields": {
+        type: "object",
+        default: []
+    },
+
+    // Defines the exposed filterable fields.
+    "filterFields": {
+        type: "object",
+        default: []
+    },
+
+    // Defines the parent of the model we are routing.
+    "parentFieldName": {
+        type: String,
+        lazyDefault: function (cfg) {
+            return cfg.bases.length > 0
+                ? cfg.bases[cfg.bases.length - 1].fieldName
+                : null;
+        }
+    }
+};
 
 /**
- * @param {Sequelize.Model} model
- * @param {string} endpointName
- * @param {[]} bases
- * @param {[]} formFields
- * @param {[]} filterFields
+ *
+ * @param cfg
  *
  * Bases are defined this way:
  *
  const bases = [
  // /{pointName}/:{fieldName}/{endpointName}
- {
+        {
             "pointName": "products",
             "model": Person,
             "fieldName": "PersonID"
         }
  ];
  */
-module.exports = function (model, endpointName, bases, formFields, filterFields) {
-    // The parent of the model we are routing
-    const parentFieldName = bases.length > 0
-        ? bases[bases.length - 1].fieldName
-        : null;
+module.exports = function (cfg) {
+    // Ensure the configuration is valid and set the default values
+    utils.implementSpecs(cfg, configurationSpecs);
 
-    const internalViews = views(
-        model, endpointName, parentFieldName, formFields, filterFields);
-    return routes(internalViews, endpointName, model, bases);
+    const internalViews = viewsBuilder(cfg);
+    return routeBuilder(cfg, internalViews);
 };
