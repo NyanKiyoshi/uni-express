@@ -20,17 +20,16 @@ module.exports = function (cfg, builders) {
         });
     };
 
-    views.createAssoc = function(request, response, next) {
+    views.createAssoc = async function (request, response, next) {
+        const query = {};
+        query[cfg.foreignKey] = request.params[cfg.endpoint];
+        query[base.foreignKey] = request.params[cfg.parentFieldName];
+
         app.query(
             next,
-            cfg.assocModel.create({
-                personId: 1,
-                groupId: 1
-            }),
-            results => {
-                response.json(results);
-            }
-        )
+            cfg.assocModel.create(query),
+            () => response.status("201").end()
+        );
     };
 
     views.deleteOne = function (request, response, next) {

@@ -14,8 +14,11 @@ db.sync({ force: true }).then(async value => {
     const group = await models.Group.create({
         title: "Dummy Group"
     });
+    const emptyGroup = await models.Group.create({
+        title: "Another Group"
+    });
 
-    person.setGroups([group]).error(err => {
+    person.setGroups([group, emptyGroup]).error(err => {
         console.log(err)
     });
 }).catch(

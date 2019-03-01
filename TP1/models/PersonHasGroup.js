@@ -4,6 +4,12 @@ const Person = require("./Person");
 const Group = require("./Group");
 
 const PersonHasGroup = db.define('PersonHasGroup', {
+    assocId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true
+    },
     personId: {
         type: Sequelize.INTEGER,
         allowNull: false,

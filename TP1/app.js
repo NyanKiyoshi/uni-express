@@ -1,13 +1,24 @@
+const errors = require("./errors");
 const app = require("express")();
 const bodyParser = require('body-parser');
 
-function query(next, promise, thenFunc) {
-    promise.then(thenFunc).catch(reason => {
+function internalError(next, err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+        next({
+            status: 400,
+            message: errors.ERR_RELATION_EXISTS,
+        });
+    }
+    else {
         next({
             status: 500,
-            message: "Something went wrong. " + reason
+            message: "Something went wrong. " + err
         });
-    });
+    }
+}
+
+function query(next, promise, thenFunc) {
+    promise.then(thenFunc).catch(reason => internalError(next, reason));
 }
 
 function errorHandler(err, req, res, next) {
@@ -52,3 +63,4 @@ module.exports.query = query;
 module.exports.errorHandler = errorHandler;
 module.exports.throwNotFound = throwNotFound;
 module.exports.sendJsonWithStatus = sendJsonWithStatus;
+module.exports.internalError = internalError;

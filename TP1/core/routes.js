@@ -59,7 +59,7 @@ function registerRoutes(router, viewBuilderUtils, routePrefix, newRoutes) {
         }
 
         // Register the new route, and invoke the wrapped handler
-        registerHandler(routePrefix + "/" + specs.path, specs.handler(viewBuilderUtils))
+        registerHandler(router, meth, routePrefix + "/" + specs.path, specs.handler(viewBuilderUtils))
     });
 }
 

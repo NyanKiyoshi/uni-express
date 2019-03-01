@@ -83,12 +83,15 @@ app.use("/", RESTFulManager({
     endpoint: "groups",
     assocName: "groups",
     assocModel: models.PersonHasGroup,
+    foreignKey: "groupId",
+
     is_many_to_many: true,
 
     bases: [{
         "pointName": "persons",
         "model": models.Person,
-        "fieldName": "personId"
+        "fieldName": "personId",
+        "foreignKey": "personId",
     }],
 
     formFields: [
