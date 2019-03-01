@@ -94,3 +94,28 @@ exports.creating_duplicate_association_between_group_and_person_return_error = f
             return done();
         });
 };
+
+exports.delete_association_valid_is_successful = function(done) {
+    supertest(app)
+        .delete('/persons/2/groups/1')
+        .expect(204)
+        .end(async function (err) {
+            assert.ifError(err);
+
+            await models.Person.findOne({ personId: 2, groupId: 1}).then(value => {
+                assert.ok(value);
+            });
+
+            return done();
+        });
+};
+
+exports.delete_association_inexisting_is_unsuccessful = function(done) {
+    supertest(app)
+        .delete('/persons/2/groups/2')
+        .expect(404)
+        .end(async function (err) {
+            assert.ifError(err);
+            return done();
+        });
+};

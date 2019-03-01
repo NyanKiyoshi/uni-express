@@ -21,27 +21,27 @@ module.exports = function (cfg, builders) {
     };
 
     views.createAssoc = async function (request, response, next) {
-        const query = {};
-        query[cfg.foreignKey] = request.params[cfg.endpoint];
-        query[base.foreignKey] = request.params[cfg.parentFieldName];
-
-        app.query(
-            next,
-            cfg.assocModel.create(query),
-            () => response.status("201").end()
-        );
+        builders.buildForm(request, next, query => {
+            app.query(
+                next,
+                cfg.assocModel.create(query),
+                () => response.status("201").end()
+            );
+        });
     };
 
     views.deleteOne = function (request, response, next) {
-        app.query(
-            next,
-            model.destroy(builders.buildWhereRequest(request)),
-            results =>  {
-                !results
-                    ? app.throwNotFound(next)
-                    : response.status("204").end();
-            }
-        );
+        builders.buildForm(request, next, query => {
+            app.query(
+                next,
+                cfg.assocModel.destroy({ where: query }),
+                results =>  {
+                    !results
+                        ? app.throwNotFound(next)
+                        : response.status("204").end();
+                }
+            );
+        });
     };
 
     return views;

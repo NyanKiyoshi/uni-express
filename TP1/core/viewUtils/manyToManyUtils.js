@@ -19,5 +19,13 @@ module.exports = function (bases, cfg) {
         };
     };
 
+    builders.buildForm = function(request, next, validFunc) {
+        const query = {};
+        query[cfg.foreignKey] = request.params[cfg.endpoint];
+        query[cfg.bases[0].foreignKey] = request.params[cfg.parentFieldName];
+
+        validFunc(query);
+    };
+
     return builders;
 };
