@@ -30,6 +30,11 @@ function errorHandler(err, req, res, next) {
         }
     }
 
+    // Handle JWT passing an error object into an error object.
+    if (err.error) {
+        err = err.error;
+    }
+
     res.status(err.status).json({
         error: err
     });

@@ -1,5 +1,8 @@
-const app = require("../app");
+const jwt = require('express-jwt');
+
 const utils = require("./utils");
+const app = require("../app");
+const config = require("../config");
 
 const REQUIRED_RESTRICTED_PATTERN_FIELDS = [
     "methods"
@@ -24,11 +27,8 @@ module.exports = function (router, primaryUrl, cfg) {
         next();
     }
 
-    async function middlewareCheckIsAuthenticated(req, res, next) {
-        next();
-    }
-
     function registerRestrictedPatterns(restrictedPatterns) {
+        const jwtMiddleware = jwt({ secret: config.JWT_SECRET_KEY });
         let patternCfg;
         let patternToRestrict;
 
@@ -47,7 +47,7 @@ module.exports = function (router, primaryUrl, cfg) {
             router.use(patternToRestrict, async (req, res, next) => {
                 // Check the method (empty list means all methods)
                 if (patternCfg.methods.length === 0 || patternCfg.methods.indexOf(req.method) > -1) {
-                    await middlewareCheckIsAuthenticated(req, res, next)
+                    jwtMiddleware(req, res, next);
                 } else {
                     // Method not restricted, continue to process the request
                     next();
