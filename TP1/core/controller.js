@@ -71,6 +71,16 @@ const configurationSpecs = {
         }
     },
 
+    // Defines the override handlers for the REST endpoint views.
+    // Usage: { internalViewName: cfg => (res, req[, next]) => ... }
+    //
+    // Note, the view can be disabled by returning null as wrapped view.
+    // Example: { viewName: cfg => null }
+    "viewOverrides": {
+        type: "object",
+        default: {}
+    },
+
     // Defines additional routes to handle and pass the REST manager.
     // This must be of the format:
     // [

@@ -17,6 +17,10 @@ app.use("/", RESTFulManager({
         "username"
     ],
 
+    viewOverrides: {
+        "createOne": () => null
+    },
+
     secondaryAdditionalRoutes: [{
         method: "POST",
         path: "signup",
