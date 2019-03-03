@@ -3,29 +3,6 @@ const middlewares = require("./middlewares");
 const utils = require("./utils");
 const sprintf = require("sprintf-js").sprintf;
 
-const REQUIRED_BASE_MODEL_DEF_FIELDS = [
-    "pointName", "model", "fieldName"
-];
-
-/**
- * Builds the URL for the new endpoints from the bases.
- */
-function buildUrl(endpointName, bases) {
-    let baseUrl = "";
-    let base;
-
-    // Add all bases to the URL
-    for (let i = 0; i < bases.length; ++i) {
-        base = bases[i];
-        utils.assertAllFields(
-            base, REQUIRED_BASE_MODEL_DEF_FIELDS, "A base is invalid");
-        baseUrl += "/" + base.pointName + "/:" + base.fieldName;
-    }
-
-    baseUrl += "/" + endpointName;
-    return baseUrl;
-}
-
 const REQUIRED_ROUTE_FIELDS = [
     "path", "method", "handler"
 ];
@@ -64,13 +41,13 @@ function registerRoutes(router, viewBuilderUtils, routePrefix, newRoutes) {
 }
 
 module.exports = function (cfg, views, viewUtils) {
-    const primaryUrl = buildUrl(cfg.endpoint, cfg.bases);
+    const primaryUrl = cfg.primaryEndpoint;
     const secondaryUrl = primaryUrl + "/:" + cfg.endpoint;
 
     const router = express.Router();
 
     // Implement middlewares before URLs
-    middlewares(router, primaryUrl, cfg.model, cfg.bases);
+    middlewares(router, primaryUrl, cfg);
 
     // Define the root routes
     registerHandler(router, "get", primaryUrl, views.getIndex);

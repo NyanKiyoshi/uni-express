@@ -4,6 +4,7 @@ const routeBuilder = require("./routes");
 const oneToManyUtils = require("./viewUtils/oneToManyUtils");
 const manyToManyUtils = require("./viewUtils/manyToManyUtils");
 const utils = require("./utils");
+const routingUtils = require("./routing_utils");
 
 const configurationSpecs = {
     // Defines the model to generate REST from.
@@ -47,6 +48,26 @@ const configurationSpecs = {
             return cfg.bases.length > 0
                 ? cfg.bases[cfg.bases.length - 1].fieldName
                 : null;
+        }
+    },
+
+    // Defines the start endpoint of the REST application.
+    "primaryEndpoint": {
+        type: "string",
+        lazyDefault: function (cfg) {
+            return routingUtils.buildUrl(cfg.endpoint, cfg.bases);
+        }
+    },
+
+    // Defines the patterns to require login for REST endpoint.
+    "restrictedPatterns": {
+        type: "object",
+        lazyDefault: function (cfg) {
+            // The whole endpoint by default
+            return [{
+                methods: [],
+                pattern: cfg.primaryEndpoint
+            }];
         }
     },
 

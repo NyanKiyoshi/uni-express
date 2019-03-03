@@ -2,24 +2,26 @@ const db = require("../db");
 const models = require("../models");
 
 db.sync({ force: true }).then(async value => {
-    const person = await models.Person.create({
+    const user = await models.User.create({
+        username: "admin",
+        password: "admin"
+    });
+
+    const person = await user.createPerson({
         firstname: "John",
         lastname: "Doe"
     });
-    const person2 = await models.Person.create({
+
+    const person2 = await user.createPerson({
         firstname: "Me",
         lastname: "Too"
     });
 
-    const group = await models.Group.create({
+    const group = await person.createGroup({
         title: "Dummy Group"
     });
-    const emptyGroup = await models.Group.create({
+    const emptyGroup = person.createGroup({
         title: "Another Group"
-    });
-
-    person.setGroups([group, emptyGroup]).error(err => {
-        console.log(err)
     });
 }).catch(
     reason => console.error(reason));
