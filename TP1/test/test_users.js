@@ -1,3 +1,5 @@
+const suite = require("./suite");
+
 const supertest = require("supertest");
 const assert = require("assert");
 const errors = require("../errors");
@@ -183,7 +185,7 @@ exports.sign_in_valid_login = function(done) {
 exports.update_user = function(done) {
     supertest(app)
         .put('/users/1')
-        .set(jwt.Headers)
+        .set(suite.jwt.Headers)
         .send({"username": "superadmin", "password": "mylittlesecret"})
         .expect(204)
         .end(async function (err, response) {
@@ -202,7 +204,7 @@ exports.update_user = function(done) {
 exports.delete_user = function(done) {
     supertest(app)
         .delete('/users/1')
-        .set(jwt.Headers)
+        .set(suite.jwt.Headers)
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
@@ -214,11 +216,10 @@ exports.delete_user = function(done) {
             try {
                 const authErrResp = await supertest(app)
                     .delete('/users/1')
-                    .set(jwt.Headers)
+                    .set(suite.jwt.Headers)
                     .expect(401);
 
                 const body = JSON.parse(authErrResp.text);
-                console.log(authErrResp.text);
                 assert.strictEqual(body["error"]["status"], 401);
                 assert.strictEqual(body["error"]["message"], errors.ERR_NO_SUCH_USER);
             } catch (err) {

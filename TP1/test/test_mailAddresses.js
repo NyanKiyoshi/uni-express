@@ -1,3 +1,5 @@
+const suite = require("./suite");
+
 const supertest = require('supertest');
 const assert = require('assert');
 
@@ -6,31 +8,10 @@ const models = require("../models");
 const app = require('../app');
 const _ = require("../routes");
 
-beforeEach(async function () {
-    await db.sync({ force: true }).then(value => {
-        models.Person.create({
-            id: 1,
-            firstname: "John",
-            lastname: "Doe"
-        });
-        models.Person.create({
-            id: 2,
-            firstname: "Miss",
-            lastname: "Da Two"
-        });
-        models.MailAddress.create({
-            id: 1,
-            type: "work",
-            address: "miss@example.com",
-            PersonId: 2
-        });
-    })
-});
-
-
 exports.inexisting_should_person_return_404 = function(done){
     supertest(app)
         .get('/persons/555/mailAddresses')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -46,6 +27,7 @@ exports.inexisting_should_person_return_404 = function(done){
 exports.person_without_mail_address_should_return_empty = function(done){
     supertest(app)
         .get('/persons/1/mailAddresses')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -63,6 +45,7 @@ exports.person_without_mail_address_should_return_empty = function(done){
 exports.person_with_mail_address_should_not_return_empty = function(done){
     supertest(app)
         .get('/persons/2/mailAddresses')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -84,6 +67,7 @@ exports.person_with_mail_address_should_not_return_empty = function(done){
 exports.filter_email_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/mailAddresses?type=work')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -101,6 +85,7 @@ exports.filter_email_numbers_valid_return = function(done){
 exports.filter_email_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/mailAddresses?type=home')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -118,6 +103,7 @@ exports.filter_email_numbers_valid_return = function(done){
 exports.get_inexisting_address = function(done){
     supertest(app)
         .get('/persons/2/mailAddresses/12')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -133,6 +119,7 @@ exports.get_inexisting_address = function(done){
 exports.get_existing_address = function(done){
     supertest(app)
         .get('/persons/2/mailAddresses/1')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -149,6 +136,7 @@ exports.get_existing_address = function(done){
 exports.create_new_email_number = function(done){
     supertest(app)
         .post('/persons/2/mailAddresses')
+        .set(suite.jwt.Headers)
         .send({"type": "work", "address": "miss3@example.com"})
         .expect(201)
         .end(async function (err, response) {
@@ -167,6 +155,7 @@ exports.create_new_email_number = function(done){
 exports.update_inexisting_address = function(done){
     supertest(app)
         .put('/persons/2/mailAddresses/12')
+        .set(suite.jwt.Headers)
         .send({"type": "home", "address": "miss2@example.com"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
@@ -183,6 +172,7 @@ exports.update_inexisting_address = function(done){
 exports.update_existing_address = function(done){
     supertest(app)
         .put('/persons/2/mailAddresses/1')
+        .set(suite.jwt.Headers)
         .send({"type": "home", "address": "miss2@example.com"})
         .expect(204)
         .end(async function (err, response) {
@@ -201,6 +191,7 @@ exports.update_existing_address = function(done){
 exports.delete_inexisting_address = function(done){
     supertest(app)
         .delete('/persons/2/mailAddresses/12')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -216,6 +207,7 @@ exports.delete_inexisting_address = function(done){
 exports.delete_existing_address = function(done){
     supertest(app)
         .delete('/persons/2/mailAddresses/1')
+        .set(suite.jwt.Headers)
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);

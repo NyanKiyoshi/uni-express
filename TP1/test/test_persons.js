@@ -1,3 +1,5 @@
+const suite = require("./suite");
+
 const supertest = require('supertest');
 const assert = require('assert');
 
@@ -6,30 +8,10 @@ const models = require("../models");
 const app = require('../app');
 const _ = require("../routes");
 
-beforeEach(async function () {
-    await db.sync({ force: true }).then(value => {
-        models.Person.create({
-            id: 1,
-            firstname: "John",
-            lastname: "Doe"
-        });
-        models.Person.create({
-            id: 2,
-            firstname: "Miss",
-            lastname: "Da Two"
-        });
-        models.Person.create({
-            id: 1,
-            type: "work",
-            number: "+33 6 00 00 00",
-            PersonId: 2
-        });
-    })
-});
-
 exports.listing_persons_returns_valid = function(done){
     supertest(app)
         .get('/persons')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -52,6 +34,7 @@ exports.listing_persons_returns_valid = function(done){
 exports.getting_inexisting_person = function(done){
     supertest(app)
         .get('/persons/555')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -67,6 +50,7 @@ exports.getting_inexisting_person = function(done){
 exports.filter_persons_valid_return = function(done){
     supertest(app)
         .get('/persons?lastname=Doe')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -84,6 +68,7 @@ exports.filter_persons_valid_return = function(done){
 exports.filters_persons_invalid_filter = function(done){
     supertest(app)
         .get('/persons?lastname=Doh')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -101,6 +86,7 @@ exports.filters_persons_invalid_filter = function(done){
 exports.create_new_person = function(done){
     supertest(app)
         .post('/persons')
+        .set(suite.jwt.Headers)
         .send({"firstname": "work", "lastname": "002"})
         .expect(201)
         .end(async function (err, response) {
@@ -118,6 +104,7 @@ exports.create_new_person = function(done){
 exports.update_inexisting_person = function(done){
     supertest(app)
         .put('/persons/555')
+        .set(suite.jwt.Headers)
         .send({"firstname": "home", "lastname": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
@@ -134,6 +121,7 @@ exports.update_inexisting_person = function(done){
 exports.update_existing_person = function(done){
     supertest(app)
         .put('/persons/1')
+        .set(suite.jwt.Headers)
         .send({"firstname": "home", "lastname": "016"})
         .expect(204)
         .end(async function (err, response) {
@@ -151,6 +139,7 @@ exports.update_existing_person = function(done){
 exports.delete_inexisting_person = function(done){
     supertest(app)
         .delete('/persons/20')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -166,6 +155,7 @@ exports.delete_inexisting_person = function(done){
 exports.delete_existing_number = function(done){
     supertest(app)
         .delete('/persons/1')
+        .set(suite.jwt.Headers)
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);

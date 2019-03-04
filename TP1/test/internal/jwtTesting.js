@@ -7,16 +7,21 @@ jwt = {
 };
 
 async function _getAccessToken() {
-    supertest(app)
+    const resp = await supertest(app)
         .post('/users/signin')
-        .send({"username": "admin", "password": "admin123"}).end(function (err, resp) {
-            if (resp.statusCode !== 200) {
-                throw "Failed to get JWT auth token";
-            }
+        .send({"username": "admin", "password": "admin123"});
 
-            jwt.AccessToken = JSON.parse(resp.text)["accessToken"];
-            jwt.Headers.Authorization = "Bearer " + jwt.AccessToken;
-        });
+    if (resp.statusCode !== 200) {
+        throw "Failed to get JWT auth token";
+    }
+
+    jwt.AccessToken = JSON.parse(resp.text)["accessToken"];
+
+    if (!jwt.AccessToken) {
+        throw "Did not get a access token.";
+    }
+
+    jwt.Headers.Authorization = "Bearer " + jwt.AccessToken;
 }
 
 jwt.getAccessToken = function() {

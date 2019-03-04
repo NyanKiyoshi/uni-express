@@ -1,35 +1,16 @@
+const suite = require("./suite");
+
 const supertest = require('supertest');
 const assert = require('assert');
 
-const db = require("../db");
 const models = require("../models");
 const app = require('../app');
 const _ = require("../routes");
 
-beforeEach(async function () {
-    await db.sync({ force: true }).then(value => {
-        models.Person.create({
-            id: 1,
-            firstname: "John",
-            lastname: "Doe"
-        });
-        models.Person.create({
-            id: 2,
-            firstname: "Miss",
-            lastname: "Da Two"
-        });
-        models.Phone.create({
-            id: 1,
-            type: "work",
-            number: "+33 6 00 00 00",
-            PersonId: 2
-        });
-    })
-});
-
 exports.inexisting_should_person_return_404 = function(done){
     supertest(app)
         .get('/persons/555/phones')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -45,6 +26,7 @@ exports.inexisting_should_person_return_404 = function(done){
 exports.person_without_number_should_return_empty = function(done){
     supertest(app)
         .get('/persons/1/phones')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -62,6 +44,7 @@ exports.person_without_number_should_return_empty = function(done){
 exports.person_with_number_should_not_return_empty = function(done){
     supertest(app)
         .get('/persons/2/phones')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -83,6 +66,7 @@ exports.person_with_number_should_not_return_empty = function(done){
 exports.filter_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/phones?type=work')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -100,6 +84,7 @@ exports.filter_numbers_valid_return = function(done){
 exports.filter_numbers_valid_return = function(done){
     supertest(app)
         .get('/persons/2/phones?type=home')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -117,6 +102,7 @@ exports.filter_numbers_valid_return = function(done){
 exports.get_inexisting_number = function(done){
     supertest(app)
         .get('/persons/2/phones/12')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -132,6 +118,7 @@ exports.get_inexisting_number = function(done){
 exports.get_existing_number = function(done){
     supertest(app)
         .get('/persons/2/phones/1')
+        .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -148,6 +135,7 @@ exports.get_existing_number = function(done){
 exports.create_new_number = function(done){
     supertest(app)
         .post('/persons/2/phones')
+        .set(suite.jwt.Headers)
         .send({"type": "work", "number": "+23"})
         .expect(201)
         .end(async function (err, response) {
@@ -167,6 +155,7 @@ exports.create_new_number = function(done){
 exports.update_inexisting_number = function(done){
     supertest(app)
         .put('/persons/2/phones/12')
+        .set(suite.jwt.Headers)
         .send({"type": "home", "number": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
@@ -183,6 +172,7 @@ exports.update_inexisting_number = function(done){
 exports.update_existing_number = function(done){
     supertest(app)
         .put('/persons/2/phones/1')
+        .set(suite.jwt.Headers)
         .send({"type": "home", "number": "+22 0000"})
         .expect(204)
         .end(async function (err, response) {
@@ -201,6 +191,7 @@ exports.update_existing_number = function(done){
 exports.delete_inexisting_number = function(done){
     supertest(app)
         .delete('/persons/2/phones/12')
+        .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
         .end(function(err, response){
@@ -215,6 +206,7 @@ exports.delete_inexisting_number = function(done){
 
 exports.delete_existing_number = function(done){
     supertest(app)
+        .set(suite.jwt.Headers)
         .delete('/persons/2/phones/1')
         .expect(204)
         .end(async function (err, response) {
