@@ -21,9 +21,9 @@ app.use("/", RESTFulManager({
         "createOne": () => null
     },
 
-    secondaryAdditionalRoutes: [{
+    primaryAdditionalRoutes: [{
         method: "POST",
-        path: "signup",
+        path: "signin",
         handler: usersViews.postSignIn
     }, {
         method: "POST",

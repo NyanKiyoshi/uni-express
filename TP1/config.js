@@ -3,6 +3,7 @@ module.exports = {
     "HTTP_LISTEN_PORT": process.env.HTTP_LISTEN_PORT || 5000,
     "HTTP_LISTEN_HOST": process.env.HTTP_LISTEN_HOST || "127.0.0.1",
     "JWT_SECRET_KEY": process.env.JWT_SECRET_KEY,
+    "JWT_EXPIRES_IN": process.env.JWT_EXPIRES_IN || "3h",
 };
 
 
