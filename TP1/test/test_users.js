@@ -203,13 +203,27 @@ exports.delete_user = function(done) {
     supertest(app)
         .delete('/users/1')
         .set(jwt.Headers)
-        .send({"username": "superadmin", "password": "mylittlesecret"})
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);
 
             const user = await models.User.findByPk(1);
             assert.ok(!user, "User wasn't deleted");
+
+            // Ensure a deleted user is not a valid JWT user
+            try {
+                const authErrResp = await supertest(app)
+                    .delete('/users/1')
+                    .set(jwt.Headers)
+                    .expect(401);
+
+                const body = JSON.parse(authErrResp.text);
+                console.log(authErrResp.text);
+                assert.strictEqual(body["error"]["status"], 401);
+                assert.strictEqual(body["error"]["message"], errors.ERR_NO_SUCH_USER);
+            } catch (err) {
+                assert.ifError(err);
+            }
 
             return done();
         });

@@ -2,6 +2,7 @@ const jwt = require('express-jwt');
 
 const utils = require("./utils");
 const app = require("../app");
+const models = require("../models");
 const config = require("../config");
 
 const REQUIRED_RESTRICTED_PATTERN_FIELDS = [
@@ -52,8 +53,31 @@ module.exports = function (router, primaryUrl, cfg) {
                     // Method not restricted, continue to process the request
                     next();
                 }
-            })
+            });
         }
+
+        // Populate req.user with the real user object from the db
+        router.use(async (req, res, next) => {
+            if (req.user) {
+                const uid = req.user.uid;
+
+                if (!uid) {
+                    throw "Expected uid to be set on request.";
+                }
+
+                // Retrieve the user from the db
+                const user = await models.User.findByPk(uid);
+
+                // If the user is not found, raise a 401 error
+                if (!user) {
+                    next(new jwt.UnauthorizedError("no_such_user", { message: "No such user." }))
+                } else {
+                    req.user = user;
+                }
+            }
+
+            next();
+        });
     }
 
     if (cfg.bases.length > 0) {
