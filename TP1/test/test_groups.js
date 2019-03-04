@@ -15,7 +15,7 @@ exports.get_inexisting_group_returns_404 = function(done) {
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -31,7 +31,7 @@ exports.get_existing_group_returns_valid = function(done) {
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -47,7 +47,7 @@ exports.inexisting_persons_group_should_return_404 = function(done) {
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -63,7 +63,7 @@ exports.group_without_persons_should_return_empty = function(done) {
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -81,7 +81,7 @@ exports.group_with_persons_should_not_return_empty = function(done) {
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -136,7 +136,7 @@ exports.update_inexisting_group = function(done) {
         .send({"title": "updated group"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -169,7 +169,7 @@ exports.delete_inexisting_group = function(done) {
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);

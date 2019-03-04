@@ -8,13 +8,13 @@ const models = require("../models");
 const app = require('../app');
 const _ = require("../routes");
 
-exports.listing_persons_returns_valid = function(done){
+exports.listing_persons_returns_valid = function(done) {
     supertest(app)
         .get('/persons')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -31,13 +31,13 @@ exports.listing_persons_returns_valid = function(done){
 };
 
 
-exports.getting_inexisting_person = function(done){
+exports.getting_inexisting_person = function(done) {
     supertest(app)
         .get('/persons/555')
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -47,13 +47,13 @@ exports.getting_inexisting_person = function(done){
         });
 };
 
-exports.filter_persons_valid_return = function(done){
+exports.filter_persons_valid_return = function(done) {
     supertest(app)
         .get('/persons?lastname=Doe')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -65,13 +65,13 @@ exports.filter_persons_valid_return = function(done){
         });
 };
 
-exports.filters_persons_invalid_filter = function(done){
+exports.filters_persons_invalid_filter = function(done) {
     supertest(app)
         .get('/persons?lastname=Doh')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -83,7 +83,7 @@ exports.filters_persons_invalid_filter = function(done){
         });
 };
 
-exports.create_new_person = function(done){
+exports.create_new_person = function(done) {
     supertest(app)
         .post('/persons')
         .set(suite.jwt.Headers)
@@ -101,14 +101,14 @@ exports.create_new_person = function(done){
         });
 };
 
-exports.update_inexisting_person = function(done){
+exports.update_inexisting_person = function(done) {
     supertest(app)
         .put('/persons/555')
         .set(suite.jwt.Headers)
         .send({"firstname": "home", "lastname": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -118,7 +118,7 @@ exports.update_inexisting_person = function(done){
         });
 };
 
-exports.update_existing_person = function(done){
+exports.update_existing_person = function(done) {
     supertest(app)
         .put('/persons/1')
         .set(suite.jwt.Headers)
@@ -136,13 +136,13 @@ exports.update_existing_person = function(done){
         });
 };
 
-exports.delete_inexisting_person = function(done){
+exports.delete_inexisting_person = function(done) {
     supertest(app)
         .delete('/persons/20')
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -152,7 +152,7 @@ exports.delete_inexisting_person = function(done){
         });
 };
 
-exports.delete_existing_number = function(done){
+exports.delete_existing_number = function(done) {
     supertest(app)
         .delete('/persons/1')
         .set(suite.jwt.Headers)

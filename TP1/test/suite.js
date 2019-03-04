@@ -71,7 +71,6 @@ beforeEach(async function () {
 
         await groupWithPersons.addPerson(personWithGroup);
         await jwt.getAccessToken();
-        console.log("BBBBBB:" +module.exports.jwt.Headers.Authorization);
     });
 
 });

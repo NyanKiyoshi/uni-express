@@ -15,7 +15,7 @@ exports.get_inexisting_person_groups_returns_404 = function(done) {
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -31,7 +31,7 @@ exports.get_existing_person_groups_returns_valid = function(done) {
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -50,7 +50,7 @@ exports.create_association_between_group_and_person = function(done) {
         .post('/persons/2/groups/2')
         .set(suite.jwt.Headers)
         .expect(201)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
             return done();
         });
@@ -62,7 +62,7 @@ exports.creating_duplicate_association_between_group_and_person_return_error = f
         .set(suite.jwt.Headers)
         .expect(400)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);

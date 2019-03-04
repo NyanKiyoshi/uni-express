@@ -7,13 +7,13 @@ const models = require("../models");
 const app = require('../app');
 const _ = require("../routes");
 
-exports.inexisting_should_person_return_404 = function(done){
+exports.inexisting_should_person_return_404 = function(done) {
     supertest(app)
         .get('/persons/555/phones')
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -23,13 +23,13 @@ exports.inexisting_should_person_return_404 = function(done){
         });
 };
 
-exports.person_without_number_should_return_empty = function(done){
+exports.person_without_number_should_return_empty = function(done) {
     supertest(app)
         .get('/persons/1/phones')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -41,13 +41,13 @@ exports.person_without_number_should_return_empty = function(done){
         });
 };
 
-exports.person_with_number_should_not_return_empty = function(done){
+exports.person_with_number_should_not_return_empty = function(done) {
     supertest(app)
         .get('/persons/2/phones')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -63,13 +63,13 @@ exports.person_with_number_should_not_return_empty = function(done){
         });
 };
 
-exports.filter_numbers_valid_return = function(done){
+exports.filter_numbers_valid_return = function(done) {
     supertest(app)
         .get('/persons/2/phones?type=work')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -81,13 +81,13 @@ exports.filter_numbers_valid_return = function(done){
         });
 };
 
-exports.filter_numbers_valid_return = function(done){
+exports.filter_numbers_valid_return = function(done) {
     supertest(app)
         .get('/persons/2/phones?type=home')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -99,13 +99,13 @@ exports.filter_numbers_valid_return = function(done){
         });
 };
 
-exports.get_inexisting_number = function(done){
+exports.get_inexisting_number = function(done) {
     supertest(app)
         .get('/persons/2/phones/12')
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -115,13 +115,13 @@ exports.get_inexisting_number = function(done){
         });
 };
 
-exports.get_existing_number = function(done){
+exports.get_existing_number = function(done) {
     supertest(app)
         .get('/persons/2/phones/1')
         .set(suite.jwt.Headers)
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -132,7 +132,7 @@ exports.get_existing_number = function(done){
         });
 };
 
-exports.create_new_number = function(done){
+exports.create_new_number = function(done) {
     supertest(app)
         .post('/persons/2/phones')
         .set(suite.jwt.Headers)
@@ -142,7 +142,6 @@ exports.create_new_number = function(done){
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
-            console.log(body);
 
             assert.strictEqual(body["PersonId"], "2");
             assert.strictEqual(body["type"], "work");
@@ -152,14 +151,14 @@ exports.create_new_number = function(done){
         });
 };
 
-exports.update_inexisting_number = function(done){
+exports.update_inexisting_number = function(done) {
     supertest(app)
         .put('/persons/2/phones/12')
         .set(suite.jwt.Headers)
         .send({"type": "home", "number": "+22 0000"})
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -169,7 +168,7 @@ exports.update_inexisting_number = function(done){
         });
 };
 
-exports.update_existing_number = function(done){
+exports.update_existing_number = function(done) {
     supertest(app)
         .put('/persons/2/phones/1')
         .set(suite.jwt.Headers)
@@ -188,13 +187,13 @@ exports.update_existing_number = function(done){
         });
 };
 
-exports.delete_inexisting_number = function(done){
+exports.delete_inexisting_number = function(done) {
     supertest(app)
         .delete('/persons/2/phones/12')
         .set(suite.jwt.Headers)
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -204,10 +203,10 @@ exports.delete_inexisting_number = function(done){
         });
 };
 
-exports.delete_existing_number = function(done){
+exports.delete_existing_number = function(done) {
     supertest(app)
-        .set(suite.jwt.Headers)
         .delete('/persons/2/phones/1')
+        .set(suite.jwt.Headers)
         .expect(204)
         .end(async function (err, response) {
             assert.ifError(err);

@@ -4,6 +4,8 @@ const RESTFulManager = require("./core/controller");
 const groupsViews = require("./views/groups");
 const usersViews = require("./views/users");
 
+require("./middlewares");
+
 // Register REST CRUD for /users/:user/...
 app.use("/", RESTFulManager({
     model: models.User,
@@ -29,12 +31,6 @@ app.use("/", RESTFulManager({
         method: "POST",
         path: "signup",
         handler: usersViews.postSignUp
-    }],
-
-    // Restrict update and deletion from CRUD to non-logged users
-    restrictedPatterns: [{
-        methods: ["PUT", "DELETE"],
-        lazyPattern: cfg => cfg.primaryEndpoint
     }]
 }));
 
@@ -69,10 +65,7 @@ app.use("/", RESTFulManager({
     ],
     filterFields: [
         "type"
-    ],
-
-    // Those endpoints are already restricted by the 'Person' parent
-    restrictedPatterns: []
+    ]
 }));
 
 // Register REST CRUD for /persons/:person/phones/:phone/...
@@ -92,10 +85,7 @@ app.use("/", RESTFulManager({
     ],
     filterFields: [
         "type"
-    ],
-
-    // Those endpoints are already restricted by the 'Person' parent
-    restrictedPatterns: []
+    ]
 }));
 
 // Register REST CRUD for /persons/:person/postalAddresses/:postalAddr/...
@@ -115,10 +105,7 @@ app.use("/", RESTFulManager({
     ],
     filterFields: [
         "type"
-    ],
-
-    // Those endpoints are already restricted by the 'Person' parent
-    restrictedPatterns: []
+    ]
 }));
 
 // Register REST CRUD for /persons/:person/groups/:group/...
@@ -144,10 +131,7 @@ app.use("/", RESTFulManager({
     ],
     filterFields: [
         "type"
-    ],
-
-    // Those endpoints are already restricted by the 'Person' parent
-    restrictedPatterns: []
+    ]
 }));
 
 // Register REST CRUD for /groups/:group/...

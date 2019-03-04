@@ -58,6 +58,6 @@ module.exports = {
         );
     },
     postSignUp: utils => (request, response, next) => {
-        response.end();
+        response.status(400).json({});
     }
 };

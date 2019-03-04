@@ -39,7 +39,7 @@ exports.get_inexisting_user_returns_404 = function(done) {
         .get('/users/555')
         .expect(404)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -54,7 +54,7 @@ exports.get_existing_user_returns_valid = function(done) {
         .get('/users/1')
         .expect(200)
         .expect("Content-Type", /^application\/json/)
-        .end(function(err, response){
+        .end(function(err, response) {
             assert.ifError(err);
 
             const body = JSON.parse(response.text);
@@ -108,7 +108,7 @@ exports.cannot_create_user_from_root_endpoint = function(done) {
 exports.cannot_create_user_from_root_endpoint = function(done) {
     supertest(app)
         .post('/users')
-        .expect(404)
+        .expect(401)
         .end(async function (err, response) {
             assert.ifError(err);
             return done();
@@ -215,7 +215,7 @@ exports.delete_user = function(done) {
             // Ensure a deleted user is not a valid JWT user
             try {
                 const authErrResp = await supertest(app)
-                    .delete('/users/1')
+                    .get('/users/1')
                     .set(suite.jwt.Headers)
                     .expect(401);
 

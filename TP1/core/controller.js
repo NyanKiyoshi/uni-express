@@ -59,18 +59,6 @@ const configurationSpecs = {
         }
     },
 
-    // Defines the patterns to require login for REST endpoint.
-    "restrictedPatterns": {
-        type: "object",
-        lazyDefault: function (cfg) {
-            // The whole endpoint by default
-            return [{
-                methods: [],
-                pattern: cfg.primaryEndpoint
-            }];
-        }
-    },
-
     // Defines the override handlers for the REST endpoint views.
     // Usage: { internalViewName: cfg => (res, req[, next]) => ... }
     //
