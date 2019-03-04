@@ -1,6 +1,8 @@
-const supertest = require('supertest');
-const assert = require('assert');
+const supertest = require("supertest");
+const assert = require("assert");
 const errors = require("../errors");
+
+const jwt = require("./internal/jwtTesting");
 
 const db = require("../db");
 const models = require("../models");
@@ -8,7 +10,7 @@ const app = require('../app');
 const _ = require("../routes");
 
 beforeEach(async function () {
-    await db.sync({ force: true }).then(async value => {
+    await db.sync({ force: true }).then(async _ => {
         await models.User.create({
             id: 1,
             username: "admin",
@@ -19,6 +21,8 @@ beforeEach(async function () {
             username: "user123",
             password: "user456"
         });
+
+        await jwt.getAccessToken();
     })
 });
 
@@ -171,6 +175,41 @@ exports.sign_in_valid_login = function(done) {
             if (!body["accessToken"]) {
                 assert.fail("Body did not return the access token");
             }
+
+            return done();
+        });
+};
+
+exports.update_user = function(done) {
+    supertest(app)
+        .put('/users/1')
+        .set(jwt.Headers)
+        .send({"username": "superadmin", "password": "mylittlesecret"})
+        .expect(204)
+        .end(async function (err, response) {
+            assert.ifError(err);
+
+            const user = await models.User.findByPk(1);
+            assert.strictEqual(user.username, "superadmin");
+            assert.ok(
+                user.checkPassword("mylittlesecret"),
+                "The password was unchanged/ improperly set");
+
+            return done();
+        });
+};
+
+exports.delete_user = function(done) {
+    supertest(app)
+        .delete('/users/1')
+        .set(jwt.Headers)
+        .send({"username": "superadmin", "password": "mylittlesecret"})
+        .expect(204)
+        .end(async function (err, response) {
+            assert.ifError(err);
+
+            const user = await models.User.findByPk(1);
+            assert.ok(!user, "User wasn't deleted");
 
             return done();
         });
