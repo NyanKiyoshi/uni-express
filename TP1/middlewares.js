@@ -7,14 +7,20 @@ const config = require("./config");
 
 const jwtMiddleware = jwt({ secret: config.JWT_SECRET_KEY });
 
-// Register the middleware with method checking
-app.use(jwtMiddleware.unless({
-    "path": [
-        { url: /^\/users(\/\d+)?$/, methods: ['GET']  },
-        { url: '/users/signup', methods: ['POST']  },
-        { url: '/users/signin', methods: ['POST']  },
-    ]
-}));
+if (config.JWT_ENABLED) {
+    // Register the middleware with method checking
+    app.use(jwtMiddleware.unless({
+        "path": [
+            {url: /^\/users(\/\d+)?$/, methods: ['GET']},
+            {url: '/users/signup', methods: ['POST']},
+            {url: '/users/signin', methods: ['POST']},
+        ]
+    }));
+} else {
+    console.warn(
+        "The JWT authentication is disabled. " +
+        "User data is at risk, please only use in development.")
+}
 
 // Populate req.user with the real user object from the db
 app.use((req, res, next) => {
