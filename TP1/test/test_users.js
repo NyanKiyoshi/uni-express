@@ -187,11 +187,13 @@ exports.update_user = function(done) {
         .put('/users/1')
         .set(suite.jwt.Headers)
         .send({"username": "superadmin", "password": "mylittlesecret"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
+            const body = JSON.parse(response.text);
             const user = await models.User.findByPk(1);
+            assert.strictEqual(body.username, "superadmin");
             assert.strictEqual(user.username, "superadmin");
             assert.ok(
                 user.checkPassword("mylittlesecret"),

@@ -173,15 +173,15 @@ exports.update_existing_number = function(done) {
         .put('/persons/2/phones/1')
         .set(suite.jwt.Headers)
         .send({"type": "home", "number": "+22 0000"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.Phone.findByPk(1).then(value => {
-                assert.strictEqual(value.get("PersonId"), 2);
-                assert.strictEqual(value.get("type"), "home");
-                assert.strictEqual(value.get("number"), "+22 0000");
-            }).catch(assert.ifError);
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["id"], 1);
+            assert.strictEqual(body["PersonId"], 2);
+            assert.strictEqual(body["type"], "home");
+            assert.strictEqual(body["number"], "+22 0000");
 
             return done();
         });

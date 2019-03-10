@@ -151,13 +151,13 @@ exports.update_existing_group = function(done) {
         .put('/groups/1')
         .set(suite.jwt.Headers)
         .send({"title": "updated group"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.Group.findByPk(1).then(value => {
-                assert.strictEqual(value.get("title"), "updated group");
-            }).catch(assert.ifError);
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["id"], 1);
+            assert.strictEqual(body["title"], "updated group");
 
             return done();
         });

@@ -173,15 +173,15 @@ exports.update_existing_number = function(done) {
         .put('/persons/2/postalAddresses/1')
         .set(suite.jwt.Headers)
         .send({"type": "home", "address": "7 rue"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.PostalAddress.findByPk(1).then(value => {
-                assert.strictEqual(value.get("PersonId"), 2);
-                assert.strictEqual(value.get("type"), "home");
-                assert.strictEqual(value.get("address"), "7 rue");
-            }).catch(assert.ifError);
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["id"], 1);
+            assert.strictEqual(body["PersonId"], 2);
+            assert.strictEqual(body["type"], "home");
+            assert.strictEqual(body["address"], "7 rue");
 
             return done();
         });

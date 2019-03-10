@@ -41,7 +41,10 @@ module.exports = function (cfg, builders) {
                 results =>  {
                     (!(results && results[0]))
                         ? app.throwNotFound(next)
-                        : response.status("204").end();
+                        : app.query(
+                            next, model.findOne(builders.buildWhereRequest(request)),
+                            payload => response.json(payload)
+                        );
                 }
             );
         });

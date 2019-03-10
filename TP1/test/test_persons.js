@@ -123,14 +123,14 @@ exports.update_existing_person = function(done) {
         .put('/persons/1')
         .set(suite.jwt.Headers)
         .send({"firstname": "home", "lastname": "016"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.Person.findByPk(1).then(value => {
-                assert.strictEqual(value.get("firstname"), "home");
-                assert.strictEqual(value.get("lastname"), "016");
-            }).catch(assert.ifError);
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["id"], 1);
+            assert.strictEqual(body["firstname"], "home");
+            assert.strictEqual(body["lastname"], "016");
 
             return done();
         });

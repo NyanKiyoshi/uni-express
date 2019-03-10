@@ -174,15 +174,15 @@ exports.update_existing_address = function(done) {
         .put('/persons/2/mailAddresses/1')
         .set(suite.jwt.Headers)
         .send({"type": "home", "address": "miss2@example.com"})
-        .expect(204)
+        .expect(200)
         .end(async function (err, response) {
             assert.ifError(err);
 
-            await models.MailAddress.findByPk(1).then(value => {
-                assert.strictEqual(value.get("PersonId"), 2);
-                assert.strictEqual(value.get("type"), "home");
-                assert.strictEqual(value.get("address"), "miss2@example.com");
-            });
+            const body = JSON.parse(response.text);
+            assert.strictEqual(body["id"], 1);
+            assert.strictEqual(body["PersonId"], 2);
+            assert.strictEqual(body["type"], "home");
+            assert.strictEqual(body["address"], "miss2@example.com");
 
             return done();
         });
