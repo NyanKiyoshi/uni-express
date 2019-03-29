@@ -63,6 +63,11 @@ function sendJsonWithStatus(response, jsonBody, status) {
 
 app.use(bodyParser.json());
 
+app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+});
+
 module.exports = app;
 module.exports.query = query;
 module.exports.errorHandler = errorHandler;
